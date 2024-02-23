@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_camp_sewa/screens/get_started.dart';
 
 void main() => runApp(const Main());
 
@@ -7,21 +8,10 @@ class Main extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var screen = MediaQuery.of(context).size.width;
-    var orientation = MediaQuery.of(context).orientation;
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SafeArea(
-            child: Center(
-          child: Text(
-            "Lebar layar HP $screen",
-            style: TextStyle(
-                fontSize: (orientation == Orientation.landscape) ? 50 : 20,
-                color: (screen < 380) ? Colors.black : Colors.blue),
-          ),
-        )),
-      ),
+      title: "KampSewa",
+      home: LoginRegister(),
     );
   }
 }
