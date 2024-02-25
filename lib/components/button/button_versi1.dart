@@ -7,9 +7,11 @@ class ButtonVersiSatu extends StatefulWidget {
   final double ukuranTombol;
   final Color warnaText;
   final bool lebarFull;
+  final Function()? aksi;
   const ButtonVersiSatu(
       {super.key,
       this.title = "Test Tombol",
+      this.aksi,
       this.bgTombol = Colors.blue,
       this.warnaText = Colors.white,
       this.lebarFull = false,
@@ -25,14 +27,14 @@ class _ButtonVersiSatuState extends State<ButtonVersiSatu> {
     return SizedBox(
       width: widget.lebarFull ? MediaQuery.of(context).size.width : null,
       child: ElevatedButton(
-          onPressed: () {},
+          onPressed: widget.aksi,
           style: ButtonStyle(
               elevation: const MaterialStatePropertyAll(10),
               padding: const MaterialStatePropertyAll(
                 EdgeInsets.symmetric(vertical: 20, horizontal: 30),
               ),
               shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
               )),
               backgroundColor: MaterialStatePropertyAll(widget.bgTombol)),
           child: Text(

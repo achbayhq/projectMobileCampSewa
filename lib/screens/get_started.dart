@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/buttionanimation/swiperight.dart';
-import 'package:project_camp_sewa/components/button/button_versi1.dart';
 import 'package:project_camp_sewa/screens/screen_login.dart';
 
 class LoginRegister extends StatefulWidget {
@@ -18,8 +17,8 @@ class _LoginRegisterState extends State<LoginRegister> {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Color(0xFF191919),
-      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Color(0xFFE8E9EC),
+      systemNavigationBarIconBrightness: Brightness.dark,
       systemNavigationBarDividerColor: Colors.transparent,
     ));
   }
@@ -41,8 +40,18 @@ class _LoginRegisterState extends State<LoginRegister> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                    size: 28,
+                  ),
+                ],
+              ),
+              const Spacer(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
