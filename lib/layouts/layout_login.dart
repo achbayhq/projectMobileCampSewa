@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
 import 'package:project_camp_sewa/models/api_response.dart';
+import 'package:project_camp_sewa/screens/screen_register.dart';
 import 'package:project_camp_sewa/services/service_user.dart';
 
 class LayoutLogin extends StatefulWidget {
@@ -54,8 +55,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
                 height: MediaQuery.of(context).size.height / 2,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(
-                        "https://i.ibb.co/bzwZMLW/pexels-dodyk-k-18377777.jpg"),
+                    image: AssetImage("assets/images/bg_login.jpg"),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -111,7 +111,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
               padding: const EdgeInsets.symmetric(horizontal: 34),
               child: ButtonVersiSatu(
                   aksi: () {
-                    loginUser();
+                    // loginUser();
                   },
                   lebarFull: true,
                   title: "Login",
@@ -119,7 +119,10 @@ class _LayoutLoginState extends State<LayoutLogin> {
             ),
             Expanded(
                 child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const RegisterScreen()));
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

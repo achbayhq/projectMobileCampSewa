@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_camp_sewa/screens/get_started.dart';
 import 'package:project_camp_sewa/screens/screen_dashboard.dart';
+import 'package:project_camp_sewa/screens/screen_register.dart';
+import 'package:project_camp_sewa/screens/splash_screen.dart';
 
 void main() => runApp(const Main());
 
@@ -15,7 +17,7 @@ class Main extends StatelessWidget {
       },
       debugShowCheckedModeBanner: false,
       title: "KampSewa",
-      home: const LoginRegister(),
+      home: const ScreenDashboard(),
     );
   }
 }

@@ -33,28 +33,29 @@ class _InputVersiSatuState extends State<InputVersiSatu> {
       decoration: BoxDecoration(
           color: widget.warnaBgInput, borderRadius: BorderRadius.circular(20)),
       child: TextField(
-          obscureText: widget.passwordTipe ? _obscureText : false,
-          keyboardType: widget.tipeInput,
-          decoration: InputDecoration(
-              hintText: widget.placeHolder,
-              border: const OutlineInputBorder(borderSide: BorderSide.none),
-              hintStyle: GoogleFonts.poppins(
-                  color: Colors.grey, fontSize: widget.ukuranFontPlaceHolder),
-              suffixIcon: widget.showEyes
-                  ? GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _obscureText =
-                              !_obscureText; // Ubah status teks tersembunyi
-                        });
-                      },
-                      child: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                    )
-                  : null,
-              prefixIcon: widget.iconInput)),
+        obscureText: widget.passwordTipe ? _obscureText : false,
+        keyboardType: widget.tipeInput,
+        decoration: InputDecoration(
+            hintText: widget.placeHolder,
+            border: const OutlineInputBorder(borderSide: BorderSide.none),
+            hintStyle: GoogleFonts.poppins(
+                color: Colors.grey, fontSize: widget.ukuranFontPlaceHolder),
+            suffixIcon: widget.showEyes
+                ? GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _obscureText =
+                            !_obscureText; // Ubah status teks tersembunyi
+                      });
+                    },
+                    child: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                  )
+                : null,
+            prefixIcon: widget.iconInput),
+      ),
     );
   }
 }
