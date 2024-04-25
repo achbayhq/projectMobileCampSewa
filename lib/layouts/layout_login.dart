@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
+import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 import 'package:project_camp_sewa/models/api_response.dart';
 import 'package:project_camp_sewa/screens/screen_register.dart';
+import 'package:project_camp_sewa/services/api_login.dart';
 import 'package:project_camp_sewa/services/service_user.dart';
 
 class LayoutLogin extends StatefulWidget {
@@ -15,21 +18,23 @@ class LayoutLogin extends StatefulWidget {
 }
 
 class _LayoutLoginState extends State<LayoutLogin> {
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  ApiLogin apiLoginController = Get.put(ApiLogin());
+
   // fungsi login
-  void loginUser() async {
-    ApiResponse apiResponse = await login(
-        usernameController.text.trim(), passwordController.text.trim());
-    if (apiResponse.error == null) {
-      Navigator.of(context).pushReplacementNamed("/dashboard");
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(apiResponse.error!),
-      ));
-    }
-  }
+  // void loginUser() async {
+  //   ApiResponse apiResponse = await login(
+  //       usernameController.text.trim(), passwordController.text.trim());
+  //   if (apiResponse.error == null) {
+  //     Navigator.of(context).pushReplacementNamed("/dashboard");
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text(apiResponse.error!),
+  //     ));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -68,20 +73,22 @@ class _LayoutLoginState extends State<LayoutLogin> {
                     color: Colors.black)),
             const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
-              child: InputVersiSatu(
-                controller: usernameController,
-                tipeInput: TextInputType.emailAddress,
-                showEyes: false,
-                iconInput: const Icon(Icons.person_outline),
-                placeHolder: "Masukkan Username",
-              ),
-            ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
+                child:
+                    InputVersiSatu(
+                      controller: apiLoginController.emailController,
+                      tipeInput: TextInputType.emailAddress,
+                      showEyes: false,
+                      iconInput: const Icon(Icons.person_outline),
+                      placeHolder: "Masukkan Username",
+                    ),
+                ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
               child: InputVersiSatu(
                 // passwordTipe: true,
-                controller: passwordController,
+                controller: apiLoginController.passwordController,
                 placeHolder: "Masukkan Password",
                 showEyes: true,
                 passwordTipe: true,
@@ -111,7 +118,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
               padding: const EdgeInsets.symmetric(horizontal: 34),
               child: ButtonVersiSatu(
                   aksi: () {
-                    // loginUser();
+                    apiLoginController.login(context);
                   },
                   lebarFull: true,
                   title: "Login",
@@ -120,8 +127,10 @@ class _LayoutLoginState extends State<LayoutLogin> {
             Expanded(
                 child: InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterScreen()));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

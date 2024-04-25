@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class BeritaCard extends StatefulWidget {
+  const BeritaCard({super.key});
+
+  @override
+  State<BeritaCard> createState() => _BeritaCardState();
+}
+
+class _BeritaCardState extends State<BeritaCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Container(
+        height: 100,
+        width: 370,
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.black.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  color: const Color(0xFF494949).withOpacity(0.3),
+                  offset: const Offset(3.0, 3.0),
+                  blurRadius: 5.0)
+            ]),
+        child: Row(
+          children: [
+            Container(
+              height: 85,
+              width: 100,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: const DecorationImage(
+                      image: AssetImage("assets/images/img-berita.png"),
+                      fit: BoxFit.fill)),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 60,
+                  width: 240,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5, top: 6),
+                    child: Text(
+                      "Gunung Semeru Erupsi dan Muntahkan Lahar Dingin blablablabla",
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        textAlign: TextAlign.left,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "detikcom", 
+                        style: GoogleFonts.poppins(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF7C7C7C)),
+                        ),
+                      const SizedBox(width: 3,),
+                       Icon(Icons.brightness_1_rounded, size: 6, color: Colors.black.withOpacity(0.7),),
+                      const SizedBox(width: 3,),
+                      Text(
+                        "4 Menit yang lalu",
+                        style: GoogleFonts.poppins(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF7C7C7C)),
+                        ),
+                    ],
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

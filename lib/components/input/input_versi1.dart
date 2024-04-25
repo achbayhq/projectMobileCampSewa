@@ -35,6 +35,7 @@ class _InputVersiSatuState extends State<InputVersiSatu> {
       child: TextField(
         obscureText: widget.passwordTipe ? _obscureText : false,
         keyboardType: widget.tipeInput,
+        controller: widget.controller,
         decoration: InputDecoration(
             hintText: widget.placeHolder,
             border: const OutlineInputBorder(borderSide: BorderSide.none),
