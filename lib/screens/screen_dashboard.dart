@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 
 class ScreenDashboard extends StatefulWidget {
   const ScreenDashboard({super.key});
@@ -10,8 +12,61 @@ class ScreenDashboard extends StatefulWidget {
 }
 
 class _ScreenDashboardState extends State<ScreenDashboard> {
+  int pageIndex = 0;
+  List homePages = const [
+    LayoutDashboard(),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+                top: BorderSide(
+                    color: Colors.black.withOpacity(0.5),
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                    width: 2.4)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30), topRight: Radius.circular(30))),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 8),
+          child: GNav(
+              backgroundColor: Colors.white,
+              color: Colors.black,
+              activeColor: Colors.black,
+              tabBackgroundColor: Colors.black.withOpacity(0.25),
+              gap: 4,
+              padding: const EdgeInsets.all(10),
+              onTabChange: (index) {
+                pageIndex = index;
+              },
+              tabs: const [
+                GButton(
+                  icon: Icons.home_filled,
+                  iconSize: 30,
+                  text: "Home",
+                ),
+                GButton(
+                  icon: Icons.dashboard_rounded,
+                  iconSize: 30,
+                  text: "Produk",
+                ),
+                GButton(
+                  icon: Icons.assignment,
+                  iconSize: 30,
+                  text: "Riwayat",
+                ),
+                GButton(
+                  icon: Icons.account_box,
+                  iconSize: 30,
+                  text: "Profile",
+                ),
+              ]),
+        ),
+      ),
+      body: homePages[pageIndex],
+    );
   }
 }

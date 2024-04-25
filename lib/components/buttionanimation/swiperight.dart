@@ -4,7 +4,7 @@ import 'package:page_transition/page_transition.dart';
 
 class ButtonSwipeRight extends StatefulWidget {
   final String title;
-  final Widget tujuan;
+  final Function()? fungsi;
   final Color titleColor;
   final Color roundedBgColor;
   final Color bgColor;
@@ -12,7 +12,7 @@ class ButtonSwipeRight extends StatefulWidget {
   const ButtonSwipeRight(
       {super.key,
       this.title = "Test Tombol",
-      required this.tujuan,
+      required this.fungsi,
       this.bgColor = const Color(0xFF1A1D11),
       this.iconColor = Colors.white,
       this.titleColor = Colors.white,
@@ -43,11 +43,13 @@ class _ButtonSwipeRightState extends State<ButtonSwipeRight> {
       },
       isFinished: isFinished,
       onFinish: () async {
+        //ini buat parameter fungsi keseluruhan swipe button
+        widget.fungsi!();
         // - - - Navigate to confirmation page - - -
-        await Navigator.push(
-            context,
-            PageTransition(
-                type: PageTransitionType.fade, child: widget.tujuan));
+        // await Navigator.push(
+        //     context,
+        //     PageTransition(
+        //         type: PageTransitionType.fade, child: widget.tujuan));
         // - - - Reset isFinished variable  - - -
         setState(() => isFinished = false);
       },

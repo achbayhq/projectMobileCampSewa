@@ -84,10 +84,10 @@ class _LoginRegisterState extends State<LoginRegister> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const ButtonSwipeRight(
-                    tujuan: LoginScreen(),
-                    title: "Mulai Sekarang!",
-                  ),
+                  // const ButtonSwipeRight(
+                  //   tujuan: LoginScreen(),
+                  //   title: "Mulai Sekarang!",
+                  // ),
                 ],
               ),
             ],
