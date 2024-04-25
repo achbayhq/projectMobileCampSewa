@@ -39,15 +39,47 @@ class _SplashScreen extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedSplashScreen(
-        nextScreen: const LoginScreen(),
-        splashTransition: SplashTransition.scaleTransition,
-        pageTransitionType: PageTransitionType.rightToLeftWithFade,
-        duration: 2000,
-        splashIconSize: 150,
-        splash: "assets/images/logo-camp-sewa.png",
-        backgroundColor: const Color(0xFF47B49A),
+        body: Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/images/background-splash-screen.png"),
+              fit: BoxFit.fill)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Center(
+              child: Container(
+                width: 250,
+                height: 200,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/logo-camp-sewa.png")),
+                ),
+              ),
+            ),
+          ),
+          Text(
+            "DEVELOP BY :",
+            style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w700),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 4, 10, 25),
+            child: Text(
+              "TEAM PRODUKTIF4",
+              style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w800),
+            ),
+          ),
+        ],
       ),
-    );
+    ));
   }
 }
