@@ -33,15 +33,15 @@ class _SplashScreen extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: AnimatedSplashScreen(
-      nextScreen: const LoginScreen(),
-      splashTransition: SplashTransition.scaleTransition,
-      pageTransitionType: PageTransitionType.rightToLeftWithFade,
-      duration: 2000,
-      splashIconSize: 150,
-      splash: "assets/images/logo-camp-sewa.png",
-      backgroundColor: const Color(0xFF47B49A),
-    ),
+      body: AnimatedSplashScreen(
+        nextScreen: const LoginScreen(),
+        splashTransition: SplashTransition.scaleTransition,
+        pageTransitionType: PageTransitionType.rightToLeftWithFade,
+        duration: 2000,
+        splashIconSize: 150,
+        splash: "assets/images/logo-camp-sewa.png",
+        backgroundColor: const Color(0xFF47B49A),
+      ),
     );
   }
 }
