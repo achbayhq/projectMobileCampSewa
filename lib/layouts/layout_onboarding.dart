@@ -161,6 +161,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Stack(
                     clipBehavior: Clip.none,
@@ -186,7 +187,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                     height: 60,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
                       controller.items[index].title,
                       style: GoogleFonts.poppins(
@@ -259,24 +260,24 @@ class MyClipper extends CustomClipper<Path> {
     // Membuat objek path untuk menentukan area yang akan dipotong
     var path = Path();
     // Menentukan titik awal path (pojok kiri atas)
-    path.lineTo(0, size.height - 25);
+    path.lineTo(0, size.height - 65);
     // Menentukan titik kontrol pertama untuk kurva Bezier pertama
-    var firstControlPoint = Offset(size.width / 8, size.height);
+    var firstControlPoint = Offset(size.width / 5, size.height);
     // Menentukan titik akhir kurva Bezier pertama
-    var firstEndPoint = Offset(size.width / 2, size.height - 0);
+    var firstEndPoint = Offset(size.width / 2, size.height - 20);
     // Menambahkan kurva Bezier pertama ke path
     path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
         firstEndPoint.dx, firstEndPoint.dy);
     // Menentukan titik kontrol kedua untuk kurva Bezier kedua
     var secondControlPoint =
-        Offset(size.width - (size.width / 4), size.height - 0);
+        Offset(size.width - (size.width / 100), size.height - 55);
     // Menentukan titik akhir kurva Bezier kedua
-    var secondEndPoint = Offset(size.width, size.height - 25);
+    var secondEndPoint = Offset(size.width, size.height - 0);
     // Menambahkan kurva Bezier kedua ke path
     path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
         secondEndPoint.dx, secondEndPoint.dy);
     // Menambahkan garis lurus ke pojok kanan bawah
-    path.lineTo(size.width, size.height - 40);
+    path.lineTo(size.width, size.height - 350);
     // Menambahkan garis lurus ke pojok kanan atas
     path.lineTo(size.width, 0);
     // Menutup path sehingga area yang ditentukan oleh path akan dipotong
