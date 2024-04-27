@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -122,7 +121,8 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 7),
                       backgroundColor: const Color(0xFF19705c),
                     ),
                     child: const Row(
@@ -169,18 +169,17 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                       ClipPath(
                         clipper: MyClipper(),
                         child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              image: DecorationImage(
-                                image:
-                                    AssetImage(controller.items[index].image),
-                                fit: BoxFit.cover,
-                              ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            image: DecorationImage(
+                              image: AssetImage(controller.items[index].image),
+                              fit: BoxFit.cover,
                             ),
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1.6,
                           ),
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height / 1.6,
                         ),
+                      ),
                     ],
                   ),
                   const SizedBox(

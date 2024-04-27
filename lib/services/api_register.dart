@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_camp_sewa/screens/screen_login.dart';
@@ -33,7 +33,8 @@ class ApiRegistrasi extends GetxController {
         final json = jsonDecode(response.body);
         if (json['Success']) {
           var user = json['Data']['FullName'];
-          print(user);
+          var logger = Logger();
+          logger.e(user);
           namaController.clear();
           emailController.clear();
           phoneNumberController.clear();

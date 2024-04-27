@@ -4,11 +4,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
-import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
-import 'package:project_camp_sewa/models/api_response.dart';
 import 'package:project_camp_sewa/screens/screen_register.dart';
 import 'package:project_camp_sewa/services/api_login.dart';
-import 'package:project_camp_sewa/services/service_user.dart';
 
 class LayoutLogin extends StatefulWidget {
   const LayoutLogin({Key? key}) : super(key: key);
@@ -73,17 +70,15 @@ class _LayoutLoginState extends State<LayoutLogin> {
                     color: Colors.black)),
             const SizedBox(height: 20),
             Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
-                child:
-                    InputVersiSatu(
-                      controller: apiLoginController.emailController,
-                      tipeInput: TextInputType.emailAddress,
-                      showEyes: false,
-                      iconInput: const Icon(Icons.person_outline),
-                      placeHolder: "Masukkan Username",
-                    ),
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
+              child: InputVersiSatu(
+                controller: apiLoginController.emailController,
+                tipeInput: TextInputType.emailAddress,
+                showEyes: false,
+                iconInput: const Icon(Icons.person_outline),
+                placeHolder: "Masukkan Username",
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
               child: InputVersiSatu(

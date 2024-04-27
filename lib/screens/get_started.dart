@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:project_camp_sewa/components/buttionanimation/swiperight.dart';
-import 'package:project_camp_sewa/screens/screen_login.dart';
 
 class LoginRegister extends StatefulWidget {
   const LoginRegister({Key? key}) : super(key: key);

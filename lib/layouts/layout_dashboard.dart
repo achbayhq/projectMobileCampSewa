@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_camp_sewa/components/card/berita_dash_card.dart';
@@ -39,7 +37,10 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                 //   end: Alignment.bottomCenter,
                 //   colors: [Color(0xFF50CB93), Color(0xFF71EFA3)],
                 // ),
-                image: DecorationImage(image: AssetImage("assets/images/dash-header-img.jpeg"), fit: BoxFit.fill, opacity: 0.7),
+                image: DecorationImage(
+                    image: AssetImage("assets/images/dash-header-img.jpeg"),
+                    fit: BoxFit.fill,
+                    opacity: 0.7),
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20))),
@@ -90,7 +91,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     ),
                     const Spacer(),
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         //fungsi klik notification
                       },
                       child: Container(
@@ -101,13 +102,19 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                           color: Colors.white.withOpacity(0.5),
                         ),
                         child: const Center(
-                          child: Icon(Icons.notifications_rounded, color: Colors.black, size: 26,),
+                          child: Icon(
+                            Icons.notifications_rounded,
+                            color: Colors.black,
+                            size: 26,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 5,),
+                    const SizedBox(
+                      width: 5,
+                    ),
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         //fungsi klik keranjang
                       },
                       child: Container(
@@ -118,7 +125,11 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                           color: Colors.white.withOpacity(0.5),
                         ),
                         child: const Center(
-                          child: Icon(Icons.shopping_cart_rounded, color: Colors.black, size: 26,),
+                          child: Icon(
+                            Icons.shopping_cart_rounded,
+                            color: Colors.black,
+                            size: 26,
+                          ),
                         ),
                       ),
                     ),
@@ -139,15 +150,22 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Colors.black.withOpacity(0.4)),
+                            border: Border.all(
+                                color: Colors.black.withOpacity(0.4)),
                           ),
                           child: Row(
                             children: [
                               const SizedBox(
                                 width: 5,
                               ),
-                              Icon(Icons.search_rounded, color: Colors.black.withOpacity(0.45), size: 35,),
-                              const SizedBox(width: 10,),
+                              Icon(
+                                Icons.search_rounded,
+                                color: Colors.black.withOpacity(0.45),
+                                size: 35,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
                               Text(
                                 "Cari Peralatan...",
                                 style: GoogleFonts.poppins(
@@ -294,7 +312,8 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                           aksi: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Kategori Tas & Sepatu diklik')),
+                                  content:
+                                      Text('Kategori Tas & Sepatu diklik')),
                             );
                           },
                         ),
@@ -303,7 +322,8 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                           aksi: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Kategori Perlengkapan diklik')),
+                                  content:
+                                      Text('Kategori Perlengkapan diklik')),
                             );
                           },
                         ),

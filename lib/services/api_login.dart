@@ -1,8 +1,7 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
 import 'package:http/http.dart' as http;
@@ -32,15 +31,18 @@ class ApiLogin extends GetxController {
         if (json['Success']) {
           var user = json['Data']['FullName'];
           var phone = json['Data']['PhoneNumber'];
-          print(user);
-          print(phone);
+          var logger = Logger();
+          logger.e(user);
+          logger.e(phone);
           emailController.clear();
           passwordController.clear();
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LayoutDashboard(),
-              ));
+          if (context.mounted) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LayoutDashboard(),
+                ));
+          }
         } else {
           throw json['Error'] ?? "Unknown Error Occurred";
         }
@@ -48,26 +50,28 @@ class ApiLogin extends GetxController {
         throw "HTTP ${response.statusCode} Error Occurred";
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: Text(
-              e.toString(),
-              style: const TextStyle(fontSize: 16, color: Colors.red),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Error"),
+              content: Text(
+                e.toString(),
+                style: const TextStyle(fontSize: 16, color: Colors.red),
               ),
-            ],
-          );
-        },
-      );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
-import 'package:page_transition/page_transition.dart';
 
 class ButtonSwipeRight extends StatefulWidget {
   final String title;

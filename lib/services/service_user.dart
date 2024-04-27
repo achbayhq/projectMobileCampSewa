@@ -1,6 +1,6 @@
 // login
 import 'dart:convert';
-
+import 'package:logger/logger.dart';
 import 'package:project_camp_sewa/constants/constant_api.dart';
 import 'package:project_camp_sewa/models/api_response.dart';
 import 'package:http/http.dart' as http;
@@ -28,8 +28,9 @@ Future<ApiResponse> login(String email, String password) async {
         break;
     }
   } catch (e) {
+    var logger = Logger();
     apiResponse.error = serverError;
-    print(e);
+    logger.e(e);
   }
   return apiResponse;
 }

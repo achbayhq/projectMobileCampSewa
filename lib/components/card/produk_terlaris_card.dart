@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProdukTerlarisDashboard extends StatefulWidget {
@@ -108,15 +106,19 @@ class _ProdukTerlarisDashboardState extends State<ProdukTerlarisDashboard> {
                     ],
                   ),
                   const Spacer(),
-                  InkWell(  //button keranjangnya
-                    onTap: (){},
+                  InkWell(
+                    //button keranjangnya
+                    onTap: () {},
                     child: Container(
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: const DecorationImage(image: AssetImage("assets/icons/keranjang-add-product.png"), fit: BoxFit.fill,)
-                      ),
+                          borderRadius: BorderRadius.circular(10),
+                          image: const DecorationImage(
+                            image: AssetImage(
+                                "assets/icons/keranjang-add-product.png"),
+                            fit: BoxFit.fill,
+                          )),
                     ),
                   ),
                 ],
