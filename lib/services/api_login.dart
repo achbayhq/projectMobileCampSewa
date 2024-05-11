@@ -2,11 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
-import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_camp_sewa/screens/screen_dashboard.dart';
 
-// Errornya ada di body dimana emailControllernya ngga bisa dapetin value emailnya
 
 class ApiLogin extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -40,7 +39,7 @@ class ApiLogin extends GetxController {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const LayoutDashboard(),
+                  builder: (context) => const ScreenDashboard(),
                 ));
           }
         } else {

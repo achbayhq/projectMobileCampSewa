@@ -5,6 +5,8 @@ import 'package:project_camp_sewa/components/card/berita_dash_card.dart';
 import 'package:project_camp_sewa/components/button/icon_kategori.dart';
 import 'package:project_camp_sewa/components/card/produk_terlaris_card.dart';
 import 'package:project_camp_sewa/components/card/wisata_dash_card.dart';
+import 'package:project_camp_sewa/layouts/layout_keranjang.dart';
+import 'package:project_camp_sewa/layouts/layout_search_screen.dart';
 
 class LayoutDashboard extends StatefulWidget {
   const LayoutDashboard({super.key});
@@ -14,6 +16,8 @@ class LayoutDashboard extends StatefulWidget {
 }
 
 class _LayoutDashboardState extends State<LayoutDashboard> {
+  List kategoriIcon = ["Tenda", "Pakaian", "Tas & Sepatu", "Perlengkapan"];
+
   List imageList = [
     {"id": 1, "image_path": 'assets/images/bg_login.jpg'},
     {"id": 2, "image_path": 'assets/images/bg-onboard-berita.jpeg'},
@@ -32,11 +36,6 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
             padding:
                 const EdgeInsets.only(left: 10, right: 10, top: 70, bottom: 25),
             decoration: const BoxDecoration(
-                // gradient: LinearGradient(
-                //   begin: Alignment.topCenter,
-                //   end: Alignment.bottomCenter,
-                //   colors: [Color(0xFF50CB93), Color(0xFF71EFA3)],
-                // ),
                 image: DecorationImage(
                     image: AssetImage("assets/images/dash-header-img.jpeg"),
                     fit: BoxFit.fill,
@@ -115,7 +114,10 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     ),
                     InkWell(
                       onTap: () {
-                        //fungsi klik keranjang
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LayoutKeranjang()));
                       },
                       child: Container(
                         width: 40,
@@ -144,36 +146,46 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     children: [
                       Expanded(
                         // field cari peralatan
-                        child: Container(
-                          height: 50,
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                                color: Colors.black.withOpacity(0.4)),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
-                                Icons.search_rounded,
-                                color: Colors.black.withOpacity(0.45),
-                                size: 35,
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                "Cari Peralatan...",
-                                style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black.withOpacity(0.45)),
-                              ),
-                            ],
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const LayoutSearchScreen(),
+                                ));
+                          },
+                          child: Container(
+                            height: 50,
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                  color: Colors.black.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: Colors.black.withOpacity(0.45),
+                                  size: 35,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Cari Peralatan...",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black.withOpacity(0.45)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -286,48 +298,24 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                   child: SizedBox(
                     height: 55,
-                    child: ListView(
+                    child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      children: [
-                        KategoriIcon(
-                          title: "Tenda",
-                          aksi: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Kategori Tenda diklik')),
-                            );
-                          },
-                        ),
-                        KategoriIcon(
-                          title: "Pakaian",
-                          aksi: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Kategori Pakaian diklik')),
-                            );
-                          },
-                        ),
-                        KategoriIcon(
-                          title: "Tas & Sepatu",
-                          aksi: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Kategori Tas & Sepatu diklik')),
-                            );
-                          },
-                        ),
-                        KategoriIcon(
-                          title: "Perlengkapan",
-                          aksi: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Kategori Perlengkapan diklik')),
-                            );
-                          },
-                        ),
-                      ],
+                      itemBuilder: (context, index) => KategoriIcon(
+                        title: kategoriIcon[index],
+                        backgroundColor: Colors.black,
+                        teksColor: Colors.white,
+                        aksi: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Kategori ${kategoriIcon[index]} diklik')),
+                          );
+                        },
+                      ),
+                      separatorBuilder: (context, index) => const SizedBox(
+                        width: 5,
+                      ),
+                      itemCount: kategoriIcon.length,
                     ),
                   ),
                 ),

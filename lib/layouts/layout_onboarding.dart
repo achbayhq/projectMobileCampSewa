@@ -18,20 +18,20 @@ class KontenOnboarding {
 class OnboardingItems {
   List<KontenOnboarding> items = [
     KontenOnboarding(
-        title: "Destinasi Wisata",
+        title: "Temukan Peralatan",
         deskripsi:
-            "Menyediakan informasi destinasi wisata yang bisa anda kunjungi ketika ingin melakukan camping atau sekedar berwisata",
-        image: "assets/images/bg-onboard-wisata.jpeg"),
+            "Pilih peralatan yang anda inginkan sebelum memulai petualangan yang menyenangkan. ",
+        image: "assets/images/onboarding-img1.jpg"),
     KontenOnboarding(
-        title: "Berita Wisata Terkini",
+        title: "Sesuaikan Kebutuhan",
         deskripsi:
-            "Anda bisa mengetahui berita up to date tentang kejadian atau sesuatu yang ada di destinasi wisata tertentu",
-        image: "assets/images/bg-onboard-berita.jpeg"),
+            "Pilih peralatan yang sesuai dengan kebutuhan anda Selama berpetualang dialam bebas. ",
+        image: "assets/images/onboarding-img2.jpg"),
     KontenOnboarding(
-        title: "Sewa Alat Camping",
+        title: "Pergi Berpetualang",
         deskripsi:
-            "Sewa alat camping seluruh wilayah murah dan berkualitas, pergi ke tempat wisata tujuan dan hilangkan stress",
-        image: "assets/images/bg_login.jpg")
+            "Berpetualan dengan perlatan yang memadai dan menikmati petualangan tanpa batas.",
+        image: "assets/images/onboarding-img3.jpg")
   ];
 }
 
@@ -59,7 +59,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
     ));
     return Scaffold(
       bottomSheet: Container(
-        color: const Color(0xFFD6F2ED),
+        color: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: isLastPage
             ? getStarted()
@@ -75,7 +75,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                             20.0), // Mengatur radius lengkungan untuk setiap sudut
                       ),
                       side: const BorderSide(
-                          color: Color(0xFF19705c)), // Mengatur warna outline
+                          color: Colors.black), // Mengatur warna outline
                       backgroundColor: Colors.transparent,
                     ),
                     child: const Row(
@@ -85,14 +85,14 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                         Text(
                           'Skip',
                           style: TextStyle(
-                            color: Color(0xFF19705c),
+                            color: Colors.black,
                             fontSize: 14,
                           ),
                         ),
                         Icon(
                           Icons.skip_next_rounded,
                           size: 25,
-                          color: Color(0xFF19705c),
+                          color: Colors.black,
                         ),
                       ],
                     ),
@@ -110,7 +110,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                       effect: const WormEffect(
                         dotHeight: 12,
                         dotWidth: 12,
-                        activeDotColor: Color(0xFF47B49A),
+                        activeDotColor: Colors.black,
                       ),
                     ),
                   ),
@@ -123,7 +123,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                           borderRadius: BorderRadius.circular(20)),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 7),
-                      backgroundColor: const Color(0xFF19705c),
+                      backgroundColor: Colors.black,
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -157,7 +157,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
           controller: pageController,
           itemBuilder: (context, index) {
             return Container(
-              decoration: const BoxDecoration(color: Color(0xFFD6F2ED)),
+              decoration: const BoxDecoration(color: Colors.white),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Column(
@@ -178,20 +178,20 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                             ),
                           ),
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 1.6,
+                          height: MediaQuery.of(context).size.height / 1.5,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(
-                    height: 60,
+                    height: 50,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
                       controller.items[index].title,
                       style: GoogleFonts.poppins(
-                        fontSize: 26,
+                        fontSize: 24,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.left,
@@ -203,7 +203,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                     child: Text(
                       controller.items[index].deskripsi,
                       style: GoogleFonts.poppins(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.left,
@@ -212,18 +212,6 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                 ],
               ),
             );
-            // Column(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     Image.asset(controller.items[index].image),
-            //     const SizedBox(height: 15),
-            //     Text(controller.items[index].title,
-            //       style: const TextStyle(fontSize: 30,fontWeight: FontWeight.bold),),
-            //     const SizedBox(height: 15),
-            //     Text(controller.items[index].deskripsi,
-            //         style: const TextStyle(color: Colors.grey,fontSize: 17), textAlign: TextAlign.center),
-            //   ],
-            // );
           }),
     );
   }
@@ -231,8 +219,14 @@ class _OnboardLayoutState extends State<OnboardLayout> {
   Widget getStarted() {
     return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: const Color(0xFFD6F2ED),
+          borderRadius: BorderRadius.circular(30),
+          gradient: const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromARGB(255, 206, 206, 206),
+                  Color.fromARGB(255, 61, 61, 61),
+                ],)
         ),
         width: MediaQuery.of(context).size.width * .9,
         height: 60,

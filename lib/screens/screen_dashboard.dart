@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
+import 'package:project_camp_sewa/layouts/layout_product.dart';
+import 'package:project_camp_sewa/screens/screen_riwayat.dart';
 
 class ScreenDashboard extends StatefulWidget {
   const ScreenDashboard({super.key});
@@ -11,9 +14,7 @@ class ScreenDashboard extends StatefulWidget {
 
 class _ScreenDashboardState extends State<ScreenDashboard> {
   int pageIndex = 0;
-  List homePages = const [
-    LayoutDashboard(),
-  ];
+  List pages = const [LayoutDashboard(), LayoutProduct(), RiwayatScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,9 @@ class _ScreenDashboardState extends State<ScreenDashboard> {
               gap: 4,
               padding: const EdgeInsets.all(10),
               onTabChange: (index) {
-                pageIndex = index;
+                setState(() {
+                  pageIndex = index;
+                });
               },
               tabs: const [
                 GButton(
@@ -64,7 +67,7 @@ class _ScreenDashboardState extends State<ScreenDashboard> {
               ]),
         ),
       ),
-      body: homePages[pageIndex],
+      body: pages[pageIndex],
     );
   }
 }

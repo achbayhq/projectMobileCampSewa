@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
 
 class ButtonSwipeRight extends StatefulWidget {
@@ -12,10 +13,10 @@ class ButtonSwipeRight extends StatefulWidget {
       {super.key,
       this.title = "Test Tombol",
       required this.fungsi,
-      this.bgColor = const Color(0xFF1A1D11),
-      this.iconColor = Colors.white,
+      this.bgColor = Colors.transparent,
+      this.iconColor = Colors.black,
       this.titleColor = Colors.white,
-      this.roundedBgColor = const Color(0xFF00880F)});
+      this.roundedBgColor = Colors.white});
 
   @override
   State<ButtonSwipeRight> createState() => _ButtonSwipeRightState();
@@ -28,7 +29,7 @@ class _ButtonSwipeRightState extends State<ButtonSwipeRight> {
   Widget build(BuildContext context) {
     return SwipeableButtonView(
       buttonText: widget.title,
-      buttontextstyle: TextStyle(fontSize: 18, color: widget.titleColor),
+      buttontextstyle: GoogleFonts.poppins(color: widget.titleColor, fontSize: 17, fontWeight: FontWeight.w600),
       buttonWidget: Icon(
         Icons.arrow_forward_ios_rounded,
         color: widget.iconColor,
