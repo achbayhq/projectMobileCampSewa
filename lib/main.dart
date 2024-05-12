@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 import 'package:project_camp_sewa/layouts/layout_detail_product.dart';
 import 'package:project_camp_sewa/layouts/layout_keranjang.dart';
+import 'package:project_camp_sewa/layouts/layout_metode_pembayaran.dart';
 import 'package:project_camp_sewa/layouts/layout_opsi_pengiriman.dart';
 import 'package:project_camp_sewa/layouts/layout_product.dart';
 import 'package:project_camp_sewa/layouts/layout_riwayat.dart';
@@ -28,6 +29,6 @@ class Main extends StatelessWidget {
     return const MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Marketplace KampSewa Indonesia",
-        home: LayoutOpsiPengiriman());
+        home: LayoutMetodePembayaran());
   }
 }
