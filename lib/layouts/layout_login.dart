@@ -20,19 +20,6 @@ class _LayoutLoginState extends State<LayoutLogin> {
 
   ApiLogin apiLoginController = Get.put(ApiLogin());
 
-  // fungsi login
-  // void loginUser() async {
-  //   ApiResponse apiResponse = await login(
-  //       usernameController.text.trim(), passwordController.text.trim());
-  //   if (apiResponse.error == null) {
-  //     Navigator.of(context).pushReplacementNamed("/dashboard");
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       content: Text(apiResponse.error!),
-  //     ));
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -122,10 +109,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
             Expanded(
                 child: InkWell(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterScreen()));
+                Get.to(const RegisterScreen());
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -44,7 +44,7 @@ class _BeritaCardState extends State<BeritaCard> {
               children: [
                 SizedBox(
                   height: 60,
-                  width: 240,
+                  width: MediaQuery.of(context).size.width / 1.8,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5, top: 6),
                     child: Text(

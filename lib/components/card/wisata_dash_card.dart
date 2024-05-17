@@ -14,7 +14,7 @@ class _WisataCardState extends State<WisataCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
-        width: 370,
+        width: MediaQuery.of(context).size.width - 30,
         height: 165,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -34,7 +34,7 @@ class _WisataCardState extends State<WisataCard> {
               bottom: 0,
               child: Container(
                 height: 65,
-                width: 370,
+                width: MediaQuery.of(context).size.width - 30,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.6),
                   borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10))

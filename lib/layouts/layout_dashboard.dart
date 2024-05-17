@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_camp_sewa/components/card/berita_dash_card.dart';
@@ -114,10 +115,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LayoutKeranjang()));
+                        Get.to(const LayoutKeranjang());
                       },
                       child: Container(
                         width: 40,
@@ -148,12 +146,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                         // field cari peralatan
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const LayoutSearchScreen(),
-                                ));
+                            Get.to(const LayoutSearchScreen());
                           },
                           child: Container(
                             height: 50,
@@ -313,7 +306,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                         },
                       ),
                       separatorBuilder: (context, index) => const SizedBox(
-                        width: 5,
+                        width: 2,
                       ),
                       itemCount: kategoriIcon.length,
                     ),
@@ -417,14 +410,16 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(15, 5, 15, 0),
                   child: SizedBox(
-                    height: 600,
+                    height: 110*8, //110 dikali item count
                     child: ListView.separated(
                       itemBuilder: (context, index) => const BeritaCard(),
                       separatorBuilder: (context, index) => const SizedBox(
                         height: 10,
                       ),
                       itemCount: 8,
-                      scrollDirection: Axis.vertical,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      //scrollDirection: Axis.vertical
                     ),
                   ),
                 ),

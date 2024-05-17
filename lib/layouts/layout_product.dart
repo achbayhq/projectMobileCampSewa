@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/icon_kategori.dart';
 import 'package:project_camp_sewa/components/card/produk_terlaris_card.dart';
@@ -97,11 +98,7 @@ class _LayoutProductState extends State<LayoutProduct> {
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25),
               child: MySearchBar(
                 aksi: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LayoutSearchScreen(),
-                      ));
+                  Get.to(const LayoutSearchScreen());
                 },
                 teks: "Tenda, Nesting, Meja Lipat, Kursi Lipat",
                 backgroundColor: Colors.white,
@@ -163,11 +160,11 @@ class _LayoutProductState extends State<LayoutProduct> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: SizedBox(
-                height: 555,
+                height: MediaQuery.of(context).size.height / 1.62,
                 child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.766,
+                        childAspectRatio: 0.740,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10),
                     scrollDirection: Axis.vertical,

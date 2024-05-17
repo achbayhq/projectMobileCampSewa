@@ -6,7 +6,6 @@ import 'package:project_camp_sewa/constants/api_endpoint.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_camp_sewa/screens/screen_dashboard.dart';
 
-
 class ApiLogin extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -36,11 +35,7 @@ class ApiLogin extends GetxController {
           emailController.clear();
           passwordController.clear();
           if (context.mounted) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ScreenDashboard(),
-                ));
+            Get.to(const ScreenDashboard());
           }
         } else {
           throw json['Error'] ?? "Unknown Error Occurred";

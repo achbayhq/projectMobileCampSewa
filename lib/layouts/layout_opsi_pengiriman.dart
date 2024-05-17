@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/alamat_opsi_pengiriman.dart';
 import 'package:project_camp_sewa/components/button/opsi_pengiriman.dart';
@@ -11,6 +13,8 @@ class LayoutOpsiPengiriman extends StatefulWidget {
 }
 
 class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
+  TextEditingController alamatStoreController = TextEditingController();
+  TextEditingController alamatUserController = TextEditingController();
   String selectedImageAntar = "assets/icons/selected-opsi-antar.png";
   String defaultImageAntar = "assets/icons/default-opsi-antar.png";
   String selectedImageAmbil = "assets/icons/selected-opsi-ambil.png";
@@ -36,7 +40,9 @@ class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
                 Padding(
                   padding: const EdgeInsets.only(left: 3),
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.back();
+                      },
                       icon: const Icon(
                         Icons.arrow_back_ios_new_rounded,
                         color: Colors.black,
@@ -173,7 +179,10 @@ class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               child: InkWell(
                 onTap: () {
-                  //button konfirmasi
+                  Get.back(
+                      result: selectedOption == "antar"   //ini nanti alamatnya ngambil dari api lalu dimasukin disini
+                          ? {'selectedOption':"Antar Ke Alamatmu" ,'alamat': "Perumahan Mastrip, Blok F50, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia"}
+                          : {'selectedOption':"Ambil di Tempat" ,'alamat': "Rumah Outdoor  Jl. Sumatra XIII No.20, Tegal Boto Lor, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia"});
                 },
                 child: Container(
                   decoration: BoxDecoration(

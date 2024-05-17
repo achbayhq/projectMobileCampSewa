@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/card/item_variant.dart';
 
@@ -85,6 +86,7 @@ class _LayoutDetailProductState extends State<LayoutDetailProduct> {
                   child: InkWell(
                     onTap: () {
                       //button back
+                      Get.back();
                     },
                     child: Container(
                       height: 40,

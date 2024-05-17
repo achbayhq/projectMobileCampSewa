@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_camp_sewa/components/card/group_produk_keranjang.dart';
 import 'package:project_camp_sewa/components/card/keranjang_card.dart';
+import 'package:project_camp_sewa/layouts/layout_checkout.dart';
 
 class LayoutKeranjang extends StatefulWidget {
   const LayoutKeranjang({super.key});
@@ -29,7 +32,9 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                   Padding(
                     padding: const EdgeInsets.only(left: 5),
                     child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.back();
+                        },
                         icon: const Icon(
                           Icons.arrow_back_ios_new_rounded,
                           color: Colors.black,
@@ -60,17 +65,27 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
             const SizedBox(
               height: 15,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: SizedBox(
-                height: 600,
-                child: ListView.separated(
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) => const KeranjangCard(),
-                    separatorBuilder: (context, index) => const SizedBox(
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 1.5,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: ListView.separated(
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) =>
+                            const GroupProdukKeranjang(
+                          namaToko: "BayHq Shop",
+                        ),
+                        separatorBuilder: (context, index) => const SizedBox(
                           height: 8,
                         ),
-                    itemCount: 10),
+                        itemCount: 3,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Container(
@@ -133,13 +148,15 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8,),
+                  const SizedBox(
+                    height: 8,
+                  ),
                   InkWell(
-                    onTap: (){
-                      //button checkout
+                    onTap: () {
+                      Get.to(const LayoutCheckout());
                     },
                     child: Container(
-                      height: 58,
+                      height: 55,
                       width: 355,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -148,7 +165,9 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                         child: Text(
                           "Checkout",
                           style: GoogleFonts.poppins(
-                              fontSize: 18.5, fontWeight: FontWeight.w800, color: Colors.white),
+                              fontSize: 18.5,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white),
                         ),
                       ),
                     ),

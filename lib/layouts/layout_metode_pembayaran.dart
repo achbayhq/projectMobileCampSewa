@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/opsi_pembayaran.dart';
+import 'package:project_camp_sewa/components/button/opsi_pembayaran_transfer.dart';
 
 class LayoutMetodePembayaran extends StatefulWidget {
   const LayoutMetodePembayaran({super.key});
@@ -17,7 +19,14 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
   Color selectedTextColor = Colors.white;
   Color defaultTextColor = Colors.black;
   String selectedOption = "transfer";
-
+  String? selectedBank;
+  List opsiTransfer = [
+    "Bank BRI",
+    "Bank Mandiri",
+    "Bank BCA",
+    "Bank BSI",
+    "Bank Sinarmas"
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +42,9 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
                 Padding(
                   padding: const EdgeInsets.only(left: 3),
                   child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.back();
+                      },
                       icon: const Icon(
                         Icons.arrow_back_ios_new_rounded,
                         color: Colors.black,
@@ -107,6 +118,52 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
                     "Pembayaran ini melalui cara transfer dan barang siap untuk dikirim atau diambil di store",
               ),
             ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                final offsetAnimation = Tween<Offset>(
+                  begin:
+                      const Offset(0.0, 0.0),
+                  end: const Offset(0.0, 0.0),
+                ).animate(animation);
+
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  ),
+                );
+              },
+              child: selectedOption == "transfer"
+                  ? Column(
+                      key: const ValueKey(
+                          'ListViewColumn'), // Key untuk mengidentifikasi widget unik
+                      children: [
+                        ListView.builder(
+                          itemCount: opsiTransfer.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectedBank = opsiTransfer[index];
+                                });
+                              },
+                              child: OpsiPembayaranTransfer(
+                                bank: opsiTransfer[index],
+                                selected: selectedBank == opsiTransfer[index],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : const SizedBox(
+                      key: ValueKey(
+                          'SizedBox')), // Key untuk mengidentifikasi widget unik
+            ),
             InkWell(
               onTap: () {
                 setState(() {
@@ -139,7 +196,10 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               child: InkWell(
                 onTap: () {
-                  //button konfirmasi
+                  Get.back(
+                      result: selectedOption == "transfer"
+                          ? {"metodeBayar": "Transfer", "jenisBank": "$selectedBank"}
+                          : {"metodeBayar": "Bayar Ditempat"});
                 },
                 child: Container(
                   decoration: BoxDecoration(

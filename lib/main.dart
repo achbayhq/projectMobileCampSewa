@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:project_camp_sewa/layouts/layout_checkout.dart';
 import 'package:project_camp_sewa/layouts/layout_dashboard.dart';
 import 'package:project_camp_sewa/layouts/layout_detail_product.dart';
 import 'package:project_camp_sewa/layouts/layout_keranjang.dart';
 import 'package:project_camp_sewa/layouts/layout_metode_pembayaran.dart';
 import 'package:project_camp_sewa/layouts/layout_opsi_pengiriman.dart';
+import 'package:project_camp_sewa/layouts/layout_pembayaran.dart';
 import 'package:project_camp_sewa/layouts/layout_product.dart';
 import 'package:project_camp_sewa/layouts/layout_riwayat.dart';
 import 'package:project_camp_sewa/layouts/layout_search_screen.dart';
@@ -26,9 +29,9 @@ class Main extends StatelessWidget {
       systemNavigationBarColor: Color(0xFF32363F),
       systemNavigationBarIconBrightness: Brightness.light,
     ));
-    return const MaterialApp(
+    return const GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Marketplace KampSewa Indonesia",
-        home: LayoutMetodePembayaran());
+        home: ScreenDashboard());
   }
 }

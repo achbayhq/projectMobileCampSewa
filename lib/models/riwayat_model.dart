@@ -3,7 +3,8 @@ class RiwayatModel {
   final String namaToko;
   final String namaProduk;
   final String qty;
-  final String deskripsi;
+  final String warna;
+  final String ukuran;
   final String qtyProdukLain;
   final String rating;
   final String harga;
@@ -18,7 +19,8 @@ class RiwayatModel {
     required this.namaProduk,
     required this.fotoProduk,
     required this.qty,
-    required this.deskripsi,
+    required this.warna,
+    required this.ukuran,
     required this.qtyProdukLain,
     required this.rating,
     required this.harga,
@@ -34,7 +36,8 @@ class RiwayatModel {
       namaProduk: json['nama_produk'],
       fotoProduk: json['foto_produk'],
       qty: json['qty'],
-      deskripsi: json['deskripsi_produk'],
+      warna: json['warna'],
+      ukuran: json['ukuran'],
       qtyProdukLain: json['qty_produk_lain'],
       rating: json['rating'],
       harga: json['harga'],

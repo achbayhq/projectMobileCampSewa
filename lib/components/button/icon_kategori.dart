@@ -28,12 +28,12 @@ class KategoriIcon extends StatelessWidget {
                   color: backgroundColor,
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Center(
                       child: Text(
                     title,
                     style: GoogleFonts.poppins(
-                        fontSize: 11,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w700,
                         color: teksColor),
                   )),

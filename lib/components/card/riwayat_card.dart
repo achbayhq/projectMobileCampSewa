@@ -8,7 +8,8 @@ class RiwayatCard extends StatefulWidget {
   final String namaToko;
   final String namaProduk;
   final String qty;
-  final String deskripsi;
+  final String variasiWarna;
+  final String variasiUkuran;
   final String qtyProdukLain;
   final String rating;
   final String harga;
@@ -25,7 +26,8 @@ class RiwayatCard extends StatefulWidget {
       required this.namaProduk,
       required this.fotoProduk,
       required this.qty,
-      required this.deskripsi,
+      this.variasiWarna = "",
+      this.variasiUkuran = "",
       required this.qtyProdukLain,
       required this.rating,
       required this.harga,
@@ -101,8 +103,8 @@ class _RiwayatCardState extends State<RiwayatCard> {
                       width: 90,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        image:
-                            DecorationImage(image: AssetImage(widget.fotoProduk)),
+                        image: DecorationImage(
+                            image: AssetImage(widget.fotoProduk)),
                         boxShadow: [
                           BoxShadow(
                               color: const Color(0xFF494949).withOpacity(0.2),
@@ -129,18 +131,17 @@ class _RiwayatCardState extends State<RiwayatCard> {
                             ),
                             Row(
                               children: [
-                                SizedBox(
-                                  height: 35,
-                                  width: 140,
-                                  child: Text(
-                                    widget.deskripsi,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11, fontWeight: FontWeight.w500),
-                                    softWrap: true,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                    textAlign: TextAlign.left,
-                                  ),
+                                Text(
+                                  widget.variasiUkuran != "" &&
+                                          widget.variasiWarna != ""
+                                      ? "${widget.variasiUkuran}/${widget.variasiWarna}"
+                                      : widget.variasiUkuran != ""
+                                          ? widget.variasiUkuran
+                                          : widget.variasiWarna,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black),
                                 ),
                                 const Spacer(),
                                 Text(
@@ -162,11 +163,13 @@ class _RiwayatCardState extends State<RiwayatCard> {
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     //Rating
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       const Icon(
                                         Icons.star,
@@ -219,7 +222,8 @@ class _RiwayatCardState extends State<RiwayatCard> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -275,7 +279,11 @@ class _RiwayatCardState extends State<RiwayatCard> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 15,right: 15, bottom: 10,),
+                padding: const EdgeInsets.only(
+                  left: 15,
+                  right: 15,
+                  bottom: 10,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

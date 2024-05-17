@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:project_camp_sewa/components/buttionanimation/swiperight.dart';
@@ -239,10 +240,14 @@ class _OnboardLayoutState extends State<OnboardLayout> {
             //After we press get started button this onboarding value become true
             // same key
             if (!mounted) return;
-            Navigator.pushReplacement(
-                context,
-                PageTransition(
-                    type: PageTransitionType.fade, child: const LoginScreen()));
+            // Navigator.pushReplacement(
+            //     context,
+            //     PageTransition(
+            //         type: PageTransitionType.fade, child: const LoginScreen()));
+            Get.off(
+              const LoginScreen(),
+              transition: Transition.fade,
+              duration: const Duration(milliseconds: 500));
           },
         ));
   }

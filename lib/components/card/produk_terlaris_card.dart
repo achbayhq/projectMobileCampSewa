@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_camp_sewa/components/bottomsheet/bottom_sheet_produk.dart';
 import 'package:project_camp_sewa/layouts/layout_detail_product.dart';
 
 class ProdukTerlarisDashboard extends StatefulWidget {
@@ -17,11 +19,7 @@ class _ProdukTerlarisDashboardState extends State<ProdukTerlarisDashboard> {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LayoutDetailProduct(),
-                      ));
+          Get.to(const LayoutDetailProduct());
         },
         child: Container(
           width: 180,
@@ -117,7 +115,13 @@ class _ProdukTerlarisDashboardState extends State<ProdukTerlarisDashboard> {
                     const Spacer(),
                     InkWell(
                       //button keranjangnya
-                      onTap: () {},
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const BottomSheetProduk(image: "assets/images/produk1.jpeg", namaProduk: "The Nort Face 4 ", harga: "20.000", variasiUkuran: ["L", "XL", "XXL"], variasiWarna: ["putih", "hitam", "pink"],);
+                            });
+                      },
                       child: Container(
                         height: 40,
                         width: 40,

@@ -216,7 +216,7 @@ class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
                 child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: (100 / 130),
+                        childAspectRatio: 0.740,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10),
                     scrollDirection: Axis.vertical,
