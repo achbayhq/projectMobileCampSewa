@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/input/otp_input.dart';
+import 'package:project_camp_sewa/layouts/layout_lupa_password_new_pass.dart';
 
 class LayoutLupaPasswordOTP extends StatefulWidget {
   const LayoutLupaPasswordOTP({super.key});
@@ -77,24 +78,51 @@ class _LayoutLupaPasswordOTPState extends State<LayoutLupaPasswordOTP> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      OtpInput(controller: otp1, focusNode: focusNode1, nextFocusNode: focusNode2,),
-                      OtpInput(controller: otp2, focusNode: focusNode2, nextFocusNode: focusNode3, previousFocusNode: focusNode1),
-                      OtpInput(controller: otp3, focusNode: focusNode3, nextFocusNode: focusNode4, previousFocusNode: focusNode2),
-                      OtpInput(controller: otp4, focusNode: focusNode4, nextFocusNode: focusNode5, previousFocusNode: focusNode3),
-                      OtpInput(controller: otp5, focusNode: focusNode5, nextFocusNode: focusNode6, previousFocusNode: focusNode4),
-                      OtpInput(controller: otp6, focusNode: focusNode6, previousFocusNode: focusNode5,),
+                      OtpInput(
+                        controller: otp1,
+                        focusNode: focusNode1,
+                        nextFocusNode: focusNode2,
+                      ),
+                      OtpInput(
+                          controller: otp2,
+                          focusNode: focusNode2,
+                          nextFocusNode: focusNode3,
+                          previousFocusNode: focusNode1),
+                      OtpInput(
+                          controller: otp3,
+                          focusNode: focusNode3,
+                          nextFocusNode: focusNode4,
+                          previousFocusNode: focusNode2),
+                      OtpInput(
+                          controller: otp4,
+                          focusNode: focusNode4,
+                          nextFocusNode: focusNode5,
+                          previousFocusNode: focusNode3),
+                      OtpInput(
+                          controller: otp5,
+                          focusNode: focusNode5,
+                          nextFocusNode: focusNode6,
+                          previousFocusNode: focusNode4),
+                      OtpInput(
+                        controller: otp6,
+                        focusNode: focusNode6,
+                        previousFocusNode: focusNode5,
+                      ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   child: InkWell(
                     onTap: () {
                       //verifikasi
+                      Get.to(const LayoutLupaPasswordNewPass());
                     },
                     child: Container(
                       decoration: BoxDecoration(

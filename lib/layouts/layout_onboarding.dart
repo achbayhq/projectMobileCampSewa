@@ -124,7 +124,7 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                           borderRadius: BorderRadius.circular(20)),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 7),
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color(0Xff010935),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -225,8 +225,8 @@ class _OnboardLayoutState extends State<OnboardLayout> {
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
                 colors: [
-                  Color.fromARGB(255, 206, 206, 206),
-                  Color.fromARGB(255, 61, 61, 61),
+                  Color(0xFF010935),
+                  Color(0xFF7981C9),
                 ],)
         ),
         width: MediaQuery.of(context).size.width * .9,

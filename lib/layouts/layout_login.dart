@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
+import 'package:project_camp_sewa/layouts/layout_lupa_password.dart';
 import 'package:project_camp_sewa/screens/screen_register.dart';
 import 'package:project_camp_sewa/services/api_login.dart';
 
@@ -84,7 +85,9 @@ class _LayoutLoginState extends State<LayoutLogin> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Get.to(const LayoutLupaPassword());
+                      },
                       child: Text(
                         "Lupa Password?",
                         style: GoogleFonts.poppins(
@@ -104,7 +107,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
                   },
                   lebarFull: true,
                   title: "Login",
-                  bgTombol: const Color(0xFF71480A)),
+                  bgTombol: const Color(0xFF010935)),
             ),
             Expanded(
                 child: InkWell(

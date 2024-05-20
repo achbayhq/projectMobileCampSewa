@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
+import 'package:project_camp_sewa/layouts/layout_lupa_password_otp.dart';
 
 class LayoutLupaPassword extends StatefulWidget {
   const LayoutLupaPassword({super.key});
@@ -41,22 +42,27 @@ class _LayoutLupaPasswordState extends State<LayoutLupaPassword> {
               "assets/images/lock-image-lupa-pass.png",
               scale: 2.35,
             ),
-            const SizedBox(height: 18,),
+            const SizedBox(
+              height: 18,
+            ),
             Text("Lupa Password",
                 style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: Colors.black)),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                  "Kamu harus verifikasi menggunakan nomor hpmu untuk mendapatkan kode OTP",
-                  style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black),
-                  textAlign: TextAlign.center,),
+                "Kamu harus verifikasi menggunakan nomor hpmu untuk mendapatkan kode OTP",
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -79,25 +85,26 @@ class _LayoutLupaPasswordState extends State<LayoutLupaPassword> {
               child: InkWell(
                 onTap: () {
                   //kirim OTP
+                  Get.to(const LayoutLupaPasswordOTP());
                 },
                 child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: const Color(0xFF010935),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          child: Text(
-                            "Kirim OTP",
-                            style: GoogleFonts.poppins(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white),
-                          ),
-                        ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF010935),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(
+                        "Kirim OTP",
+                        style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white),
                       ),
                     ),
+                  ),
+                ),
               ),
             ),
           ],

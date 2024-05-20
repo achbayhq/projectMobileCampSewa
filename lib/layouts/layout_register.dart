@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
@@ -21,62 +22,8 @@ class _LayoutRegisterState extends State<LayoutRegister> {
   TextEditingController passController = TextEditingController();
   TextEditingController dateController = TextEditingController();
 
-  final List<String> provinsiList = [
-    'Jawa Timur',
-    'Jawa Barat',
-    'Jawa Tengah',
-    'Jakarta',
-    'Bali',
-    'Kalimantan Tengah',
-    'Kalimantan Barat',
-    'Sulawesi Utara',
-  ];
-  final List<String> kabupatenList = [
-    'Jember',
-    'Mojokerto',
-    'Tuban',
-    'Banyuwangi',
-    'Denpasar',
-    'Ternate',
-    'Lombok',
-    'Solo',
-  ];
-  final List<String> kecamatanList = [
-    'Sumbersari',
-    'Tegal Baru',
-    'Gempol',
-    'Gedeg',
-    'Talam',
-    'Bangkal',
-    'Kembangsari',
-    'Salasatu',
-  ];
-  final List<String> desaList = [
-    'Desa satu',
-    'Desa dua',
-    'Desa tiga',
-    'Desa empat',
-    'Desa lima',
-    'Desa enam',
-    'Desa tujuh',
-    'Desa delapan',
-  ];
-
-  String? selectedProvinsi;
-  String? selectedKabupaten;
-  String? selectedKecamatan;
-  String? selectedDesa;
-  final TextEditingController provinsiController = TextEditingController();
-  final TextEditingController kabupatenController = TextEditingController();
-  final TextEditingController kecamatanController = TextEditingController();
-  final TextEditingController desaController = TextEditingController();
-
   @override
   void dispose() {
-    provinsiController.dispose();
-    kabupatenController.dispose();
-    kecamatanController.dispose();
-    desaController.dispose();
     super.dispose();
   }
 
@@ -102,7 +49,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               clipper: MyClipper(),
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 3.8,
+                height: MediaQuery.of(context).size.height / 3.2,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
@@ -124,7 +71,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
                 controller: usrnmController,
                 tipeInput: TextInputType.name,
@@ -134,7 +81,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
                 controller: emailController,
                 tipeInput: TextInputType.emailAddress,
@@ -144,7 +91,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
                 controller: phoneController,
                 tipeInput: TextInputType.phone,
@@ -154,19 +101,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
-              child: InputVersiSatu(
-                // passwordTipe: true,
-                controller: passController,
-                placeHolder: "Password",
-                showEyes: true,
-                passwordTipe: true,
-                iconInput: const Icon(Icons.key_outlined),
-                tipeInput: TextInputType.visiblePassword,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -176,7 +111,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
                     onTap: () {
                       _selectDate(context);
                     },
-                    keyboardType: TextInputType.datetime,
+                    keyboardType: TextInputType.none,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.date_range),
                       hintText: "Tanggal Lahir",
@@ -188,239 +123,34 @@ class _LayoutRegisterState extends State<LayoutRegister> {
                   )),
             ),
             Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
-                child: CustomDropdown(
-                    hint: "Select Provinsi",
-                    value: selectedProvinsi,
-                    dropdownItems: provinsiList,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedProvinsi = value;
-                      });
-                    },
-                    dropdownWidth: 250,
-                    buttonWidth: 450,
-                    buttonHeight: 50,
-                    dropdownSearchData: DropdownSearchData(
-                      searchController: provinsiController,
-                      searchInnerWidgetHeight: 100,
-                      searchInnerWidget: Container(
-                        height: 50,
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 4,
-                          right: 8,
-                          left: 8,
-                        ),
-                        child: TextFormField(
-                          expands: true,
-                          maxLines: null,
-                          controller: provinsiController,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            hintText: 'Cari Provinsi...',
-                            hintStyle: const TextStyle(fontSize: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      searchMatchFn: (item, searchValue) {
-                        return item.value.toString().contains(searchValue);
-                      },
-                    ),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        provinsiController.clear();
-                      }
-                    })),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
-                child: CustomDropdown(
-                    hint: "Select Kabupaten",
-                    value: selectedKabupaten,
-                    dropdownItems: kabupatenList,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedKabupaten = value;
-                      });
-                    },
-                    dropdownWidth: 250,
-                    buttonWidth: 450,
-                    buttonHeight: 50,
-                    dropdownSearchData: DropdownSearchData(
-                      searchController: kabupatenController,
-                      searchInnerWidgetHeight: 100,
-                      searchInnerWidget: Container(
-                        height: 50,
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 4,
-                          right: 8,
-                          left: 8,
-                        ),
-                        child: TextFormField(
-                          expands: true,
-                          maxLines: null,
-                          controller: kabupatenController,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            hintText: 'Cari Kabupaten...',
-                            hintStyle: const TextStyle(fontSize: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      searchMatchFn: (item, searchValue) {
-                        return item.value.toString().contains(searchValue);
-                      },
-                    ),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        kabupatenController.clear();
-                      }
-                    })),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
-                child: CustomDropdown(
-                    hint: "Select Kecamatan",
-                    value: selectedKecamatan,
-                    dropdownItems: kecamatanList,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedKecamatan = value;
-                      });
-                    },
-                    dropdownWidth: 250,
-                    buttonWidth: 450,
-                    buttonHeight: 50,
-                    dropdownSearchData: DropdownSearchData(
-                      searchController: kecamatanController,
-                      searchInnerWidgetHeight: 100,
-                      searchInnerWidget: Container(
-                        height: 50,
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 4,
-                          right: 8,
-                          left: 8,
-                        ),
-                        child: TextFormField(
-                          expands: true,
-                          maxLines: null,
-                          controller: kecamatanController,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            hintText: 'Cari Kecamatan...',
-                            hintStyle: const TextStyle(fontSize: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      searchMatchFn: (item, searchValue) {
-                        return item.value.toString().contains(searchValue);
-                      },
-                    ),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        kecamatanController.clear();
-                      }
-                    })),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34, vertical: 4),
-                child: CustomDropdown(
-                    hint: "Select Desa",
-                    value: selectedDesa,
-                    dropdownItems: desaList,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedDesa = value;
-                      });
-                    },
-                    dropdownWidth: 250,
-                    buttonWidth: 450,
-                    buttonHeight: 50,
-                    dropdownSearchData: DropdownSearchData(
-                      searchController: desaController,
-                      searchInnerWidgetHeight: 100,
-                      searchInnerWidget: Container(
-                        height: 50,
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 4,
-                          right: 8,
-                          left: 8,
-                        ),
-                        child: TextFormField(
-                          expands: true,
-                          maxLines: null,
-                          controller: desaController,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            hintText: 'Cari Desa...',
-                            hintStyle: const TextStyle(fontSize: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      searchMatchFn: (item, searchValue) {
-                        return item.value.toString().contains(searchValue);
-                      },
-                    ),
-                    //This to clear the search value when you close the menu
-                    onMenuStateChange: (isOpen) {
-                      if (!isOpen) {
-                        desaController.clear();
-                      }
-                    })),
-            const SizedBox(height: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
+              child: InputVersiSatu(
+                // passwordTipe: true,
+                controller: passController,
+                placeHolder: "Password",
+                showEyes: true,
+                passwordTipe: true,
+                iconInput: const Icon(Icons.key_outlined),
+                tipeInput: TextInputType.visiblePassword,
+              ),
+            ),
+            const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34),
               child: ButtonVersiSatu(
                   aksi: () {
-                    // Navigator.push(
-                    //     context, PageRouteBuilder(pageBuilder: HomePage()));
+                    Get.back();
                   },
                   lebarFull: true,
-                  title: "Login",
-                  bgTombol: const Color(0xFF71480A)),
+                  title: "Register",
+                  bgTombol: const Color(0xFF010935)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 25),
               child: Center(
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

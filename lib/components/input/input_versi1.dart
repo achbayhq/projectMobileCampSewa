@@ -38,7 +38,7 @@ class _InputVersiSatuState extends State<InputVersiSatu> {
           color: widget.warnaBgInput,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: Colors.black,
+              color: widget.border ? Colors.black : Colors.transparent,
               width: widget.border ? widget.ketebalanBorder : 0)),
       child: TextField(
         obscureText: widget.passwordTipe ? _obscureText : false,
