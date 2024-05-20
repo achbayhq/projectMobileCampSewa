@@ -60,7 +60,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
               child: InputVersiSatu(
                 controller: apiLoginController.emailController,
-                tipeInput: TextInputType.emailAddress,
+                tipeInput: TextInputType.none,
                 showEyes: false,
                 iconInput: const Icon(Icons.person_outline),
                 placeHolder: "Masukkan Username",
