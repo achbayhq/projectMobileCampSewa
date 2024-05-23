@@ -16,9 +16,6 @@ class LayoutLogin extends StatefulWidget {
 }
 
 class _LayoutLoginState extends State<LayoutLogin> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
   ApiLogin apiLoginController = Get.put(ApiLogin());
 
   @override
@@ -61,7 +58,7 @@ class _LayoutLoginState extends State<LayoutLogin> {
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
               child: InputVersiSatu(
                 controller: apiLoginController.emailController,
-                tipeInput: TextInputType.none,
+                tipeInput: TextInputType.text,
                 showEyes: false,
                 iconInput: const Icon(Icons.person_outline),
                 placeHolder: "Masukkan Username",

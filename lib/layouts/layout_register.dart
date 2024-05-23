@@ -1,12 +1,11 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:project_camp_sewa/components/button/button_versi1.dart';
-import 'package:project_camp_sewa/components/dropdown/dropdown_search.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
+import 'package:project_camp_sewa/services/api_register.dart';
 
 class LayoutRegister extends StatefulWidget {
   const LayoutRegister({super.key});
@@ -16,11 +15,7 @@ class LayoutRegister extends StatefulWidget {
 }
 
 class _LayoutRegisterState extends State<LayoutRegister> {
-  TextEditingController usrnmController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController passController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
+  ApiRegistrasi apiRegistrasi = Get.put(ApiRegistrasi());
 
   @override
   void dispose() {
@@ -73,7 +68,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
-                controller: usrnmController,
+                controller: apiRegistrasi.namaController,
                 tipeInput: TextInputType.name,
                 showEyes: false,
                 iconInput: const Icon(Icons.person_outline),
@@ -83,7 +78,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
-                controller: emailController,
+                controller: apiRegistrasi.emailController,
                 tipeInput: TextInputType.emailAddress,
                 showEyes: false,
                 iconInput: const Icon(Icons.email_rounded),
@@ -93,7 +88,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
-                controller: phoneController,
+                controller: apiRegistrasi.phoneNumberController,
                 tipeInput: TextInputType.phone,
                 showEyes: false,
                 iconInput: const Icon(Icons.phone),
@@ -107,7 +102,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20)),
                   child: TextField(
-                    controller: dateController,
+                    controller: apiRegistrasi.tanggalLahirController,
                     onTap: () {
                       _selectDate(context);
                     },
@@ -126,7 +121,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 5),
               child: InputVersiSatu(
                 // passwordTipe: true,
-                controller: passController,
+                controller: apiRegistrasi.passwordController,
                 placeHolder: "Password",
                 showEyes: true,
                 passwordTipe: true,
@@ -139,7 +134,7 @@ class _LayoutRegisterState extends State<LayoutRegister> {
               padding: const EdgeInsets.symmetric(horizontal: 34),
               child: ButtonVersiSatu(
                   aksi: () {
-                    Get.back();
+                    apiRegistrasi.registrasi(context);
                   },
                   lebarFull: true,
                   title: "Register",
@@ -179,9 +174,9 @@ class _LayoutRegisterState extends State<LayoutRegister> {
         context: context, firstDate: DateTime(2000), lastDate: DateTime(2100));
 
     if (pickedDate != null) {
-      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       setState(() {
-        dateController.text = formattedDate;
+        apiRegistrasi.tanggalLahirController.text = formattedDate;
       });
     }
   }

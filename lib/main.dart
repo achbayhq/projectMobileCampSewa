@@ -22,6 +22,7 @@ import 'package:project_camp_sewa/screens/screen_dashboard.dart';
 import 'package:project_camp_sewa/screens/screen_login.dart';
 import 'package:project_camp_sewa/screens/screen_riwayat.dart';
 import 'package:project_camp_sewa/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const Main());
 
@@ -40,6 +41,6 @@ class Main extends StatelessWidget {
     return const GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Marketplace KampSewa Indonesia",
-        home: OnboardLayout());
+        home: LoginScreen());
   }
 }

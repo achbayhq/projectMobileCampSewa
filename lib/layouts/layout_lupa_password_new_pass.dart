@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
+import 'package:project_camp_sewa/services/api_lupa_password.dart';
 
 class LayoutLupaPasswordNewPass extends StatefulWidget {
   const LayoutLupaPasswordNewPass({super.key});
@@ -12,10 +13,11 @@ class LayoutLupaPasswordNewPass extends StatefulWidget {
 }
 
 class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
-  TextEditingController passBaruController = TextEditingController();
-  TextEditingController konfirmasiPassController = TextEditingController();
+  ApiLupaPassword apiLupaPassword = Get.put(ApiLupaPassword());
   @override
   Widget build(BuildContext context) {
+    final dataKiriman = Get.arguments as Map<String, dynamic>;
+    String noTelephone = dataKiriman['nomor_telephone'];
     return Scaffold(
       body: SafeArea(
           child: Container(
@@ -90,7 +92,7 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
                   ),
                   child: InputVersiSatu(
                     tipeInput: TextInputType.visiblePassword,
-                    controller: passBaruController,
+                    controller: apiLupaPassword.newPassController,
                     showEyes: true,
                     passwordTipe: true,
                     iconInput: const Icon(
@@ -105,7 +107,8 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5, top: 15),
+                  padding: const EdgeInsets.only(
+                      left: 25, right: 20, bottom: 5, top: 15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -123,7 +126,7 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: InputVersiSatu(
                     tipeInput: TextInputType.visiblePassword,
-                    controller: konfirmasiPassController,
+                    controller: apiLupaPassword.confirmPassController,
                     showEyes: true,
                     passwordTipe: true,
                     iconInput: const Icon(
@@ -143,6 +146,7 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
                   child: InkWell(
                     onTap: () {
                       //konfirmasi
+                      apiLupaPassword.lupaPassResetPass(context, noTelephone);
                     },
                     child: Container(
                       decoration: BoxDecoration(

@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:project_camp_sewa/layouts/layout_onboarding.dart';
+import 'package:project_camp_sewa/screens/screen_dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,22 +16,33 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreen extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  String? token;
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? ambilToken = prefs.getString('token');
+    if (ambilToken != null) {
+      token = ambilToken;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 2), () {
-      // Navigator.of(context).pushReplacement(
-      //   PageTransition(
-      //       type: PageTransitionType.rightToLeft,
-      //       child: const OnboardLayout(),
-      //       reverseDuration: const Duration(seconds: 2)),
-      // );
-      Get.off(
-        () => const OnboardLayout(),
-        transition: Transition.rightToLeft,
-        duration: const Duration(seconds: 2),
-      );
+    loadUserData().then((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        // Navigator.of(context).pushReplacement(
+        //   PageTransition(
+        //       type: PageTransitionType.rightToLeft,
+        //       child: const OnboardLayout(),
+        //       reverseDuration: const Duration(seconds: 2)),
+        // );
+        Get.off(
+          () => token != null ? const ScreenDashboard() : const OnboardLayout(),
+          transition: Transition.rightToLeft,
+          duration: const Duration(seconds: 2),
+        );
+      });
     });
   }
 

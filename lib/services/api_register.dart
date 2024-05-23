@@ -1,9 +1,12 @@
 import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:project_camp_sewa/components/dialog/alert_dialog.dart';
+import 'package:project_camp_sewa/components/dialog/loading_dialog.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
-import 'package:http/http.dart' as http;
 import 'package:project_camp_sewa/screens/screen_login.dart';
 
 class ApiRegistrasi extends GetxController {
@@ -11,72 +14,91 @@ class ApiRegistrasi extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  TextEditingController tanggalLahirController = TextEditingController();
+  final Dio dio = Dio();
+  final LoadingDialog loading = Get.put(LoadingDialog());
 
-  Future<void> registrasi() async {
+  Future<void> registrasi(BuildContext context) async {
     try {
+      loading.showLoadingDialog();
       var header = {'Content-Type': 'application/json'};
-      var url =
-          Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.authendpoints.register);
+      var url = ApiEndpoints.baseUrl + ApiEndpoints.authendpoints.register;
       Map body = {
-        'fullName': namaController.text,
+        'name': namaController.text,
         'email': emailController.text.trim(),
-        'phoneNumber': phoneNumberController.text,
+        'nomor_telephone': phoneNumberController.text,
         'password': passwordController.text,
-        'confirmPassword': confirmPasswordController.text
+        'tanggal_lahir': tanggalLahirController.text
       };
 
-      http.Response response =
-          await http.post(url, body: jsonEncode(body), headers: header);
+      final response = await dio.post(url,
+          data: body,
+          options: Options(
+            headers: header,
+            validateStatus: (status) {
+              return status! < 500; // Accept status codes less than 500
+            },
+          ));
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        if (json['Success']) {
-          var user = json['Data']['FullName'];
-          var logger = Logger();
-          logger.e(user);
-          namaController.clear();
-          emailController.clear();
-          phoneNumberController.clear();
-          passwordController.clear();
-          confirmPasswordController.clear();
+      final Map<String, dynamic> json =
+          response.data is String ? jsonDecode(response.data) : response.data;
+
+      loading.hideLoadingDialog();
+
+      if (response.statusCode == 201) {
+        final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: CustomSnackBar(
+              sukses: true,
+              teks: json['message'],
+            ));
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
+        namaController.clear();
+        emailController.clear();
+        phoneNumberController.clear();
+        passwordController.clear();
+        tanggalLahirController.clear();
+        if (context.mounted) {
           Get.to(const LoginScreen());
-        } else {
-          throw jsonDecode(response.body)['Error'] ?? "Unknown Error Occured";
         }
-      } else {
-        throw jsonDecode(response.body)['Error'] ?? "Unknown Error Occured";
+      } else{
+        String errorMessage = json['error'];
+        final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: CustomSnackBar(
+              sukses: false,
+              teks: errorMessage,
+            ));
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
-    } catch (e) {
-      Get.back();
-      showDialog(
-          context: Get.context!,
-          builder: (context) {
-            return Stack(
-              children: [
-                SimpleDialog(
-                  title: const Text("Error"),
-                  contentPadding: const EdgeInsets.all(16),
-                  children: [
-                    Text(
-                      e.toString(),
-                      style: const TextStyle(fontSize: 16, color: Colors.red),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: const Icon(Icons.close),
+    } on DioException catch (dioError) {
+      if (context.mounted) {
+        loading.hideLoadingDialog();
+        if (context.mounted) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  backgroundColor: Colors.transparent,
+                  content: CustomAlertDialog(
+                    sukses: false,
+                    teks: dioError.message ?? "An unknown error occurred",
                   ),
-                ),
-              ],
-            );
-          });
+                );
+              });
+        }
+      }
     }
   }
 }

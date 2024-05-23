@@ -8,6 +8,8 @@ import 'package:project_camp_sewa/components/card/produk_terlaris_card.dart';
 import 'package:project_camp_sewa/components/card/wisata_dash_card.dart';
 import 'package:project_camp_sewa/layouts/layout_keranjang.dart';
 import 'package:project_camp_sewa/layouts/layout_search_screen.dart';
+import 'package:project_camp_sewa/screens/screen_login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LayoutDashboard extends StatefulWidget {
   const LayoutDashboard({super.key});
@@ -91,8 +93,12 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     ),
                     const Spacer(),
                     InkWell(
-                      onTap: () {
+                      onTap: () async {
                         //fungsi klik notification
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('token');
+                        await prefs.remove('userId');
+                        Get.to(const LoginScreen());
                       },
                       child: Container(
                         width: 40,
@@ -410,7 +416,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(15, 5, 15, 0),
                   child: SizedBox(
-                    height: 110*8, //110 dikali item count
+                    height: 110 * 8, //110 dikali item count
                     child: ListView.separated(
                       itemBuilder: (context, index) => const BeritaCard(),
                       separatorBuilder: (context, index) => const SizedBox(

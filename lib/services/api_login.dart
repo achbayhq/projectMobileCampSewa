@@ -1,70 +1,116 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:project_camp_sewa/components/dialog/alert_dialog.dart';
+import 'package:project_camp_sewa/components/dialog/loading_dialog.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
-import 'package:http/http.dart' as http;
 import 'package:project_camp_sewa/screens/screen_dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiLogin extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final Dio dio = Dio();
+  final LoadingDialog loading = Get.put(LoadingDialog());
 
   Future<void> login(BuildContext context) async {
     try {
+      loading.showLoadingDialog();
       var header = {'Content-Type': 'application/json'};
-      var url =
-          Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.authendpoints.login);
+      var url = ApiEndpoints.baseUrl + ApiEndpoints.authendpoints.login;
 
       Map body = {
-        "email": emailController.text,
+        "identifier": emailController.text,
         "password": passwordController.text
       };
 
-      http.Response response =
-          await http.post(url, body: jsonEncode(body), headers: header);
+      final response = await dio.post(url,
+          data: body,
+          options: Options(
+            headers: header,
+            validateStatus: (status) {
+              return status! < 500; // Accept status codes less than 500
+            },
+          ));
+
+      final Map<String, dynamic> json =
+          response.data is String ? jsonDecode(response.data) : response.data;
+
+      loading.hideLoadingDialog();
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        if (json['Success']) {
-          var user = json['Data']['FullName'];
-          var phone = json['Data']['PhoneNumber'];
-          var logger = Logger();
-          logger.e(user);
-          logger.e(phone);
+        if (json['access_token'] != null) {
+          var token = json['access_token'];
+          var idUser = json['user']['id'];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setInt('idUser', idUser);
           emailController.clear();
           passwordController.clear();
+
+          final snackBar = SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              content: CustomSnackBar(
+                sukses: true,
+                teks: "Login Berhasil Sebagai ${json['user']['name']}",
+              ));
+
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(snackBar);
+
           if (context.mounted) {
-            Get.to(const ScreenDashboard());
+            Get.off(const ScreenDashboard());
           }
         } else {
-          throw json['Error'] ?? "Unknown Error Occurred";
+          const snackBar = SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              content: CustomSnackBar(
+                sukses: false,
+                teks: "Anda tidak memiliki akses untuk Login",
+              ));
+
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(snackBar);
         }
-      } else {
-        throw "HTTP ${response.statusCode} Error Occurred";
+      } else if (response.statusCode == 401) {
+        String errorMessage = json['message'];
+        final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: CustomSnackBar(
+              sukses: false,
+              title: "Error",
+              teks: errorMessage,
+            ));
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
-    } catch (e) {
+    } on DioException catch (dioError) {
+      loading.hideLoadingDialog();
+      print(dioError.message);
       if (context.mounted) {
         showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text("Error"),
-              content: Text(
-                e.toString(),
-                style: const TextStyle(fontSize: 16, color: Colors.red),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                backgroundColor: Colors.transparent,
+                content: CustomAlertDialog(
+                  sukses: false,
+                  teks: dioError.message ?? "An unknown error occurred",
                 ),
-              ],
-            );
-          },
-        );
+              );
+            });
       }
     }
   }

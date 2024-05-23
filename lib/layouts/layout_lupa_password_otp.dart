@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/input/otp_input.dart';
 import 'package:project_camp_sewa/layouts/layout_lupa_password_new_pass.dart';
+import 'package:project_camp_sewa/services/api_lupa_password.dart';
 
 class LayoutLupaPasswordOTP extends StatefulWidget {
   const LayoutLupaPasswordOTP({super.key});
@@ -12,6 +13,7 @@ class LayoutLupaPasswordOTP extends StatefulWidget {
 }
 
 class _LayoutLupaPasswordOTPState extends State<LayoutLupaPasswordOTP> {
+  ApiLupaPassword apiLupaPassword = Get.put(ApiLupaPassword());
   TextEditingController otp1 = TextEditingController();
   TextEditingController otp2 = TextEditingController();
   TextEditingController otp3 = TextEditingController();
@@ -24,8 +26,11 @@ class _LayoutLupaPasswordOTPState extends State<LayoutLupaPasswordOTP> {
   final FocusNode focusNode4 = FocusNode();
   final FocusNode focusNode5 = FocusNode();
   final FocusNode focusNode6 = FocusNode();
+
   @override
   Widget build(BuildContext context) {
+    final dataKiriman = Get.arguments as Map<String, dynamic>;
+    String noTelephone = dataKiriman['nomor_telephone'];
     return Scaffold(
       body: SafeArea(
           child: Container(
@@ -122,7 +127,14 @@ class _LayoutLupaPasswordOTPState extends State<LayoutLupaPasswordOTP> {
                   child: InkWell(
                     onTap: () {
                       //verifikasi
-                      Get.to(const LayoutLupaPasswordNewPass());
+                      String inputOTP = otp1.text +
+                          otp2.text +
+                          otp3.text +
+                          otp4.text +
+                          otp5.text +
+                          otp6.text;
+                      apiLupaPassword.lupaPassVerifikasiOTP(
+                          context, inputOTP, noTelephone);
                     },
                     child: Container(
                       decoration: BoxDecoration(

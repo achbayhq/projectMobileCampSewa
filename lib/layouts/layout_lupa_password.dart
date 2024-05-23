@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/input/input_versi1.dart';
 import 'package:project_camp_sewa/layouts/layout_lupa_password_otp.dart';
+import 'package:project_camp_sewa/services/api_lupa_password.dart';
 
 class LayoutLupaPassword extends StatefulWidget {
   const LayoutLupaPassword({super.key});
@@ -12,7 +13,7 @@ class LayoutLupaPassword extends StatefulWidget {
 }
 
 class _LayoutLupaPasswordState extends State<LayoutLupaPassword> {
-  TextEditingController noTeleponController = TextEditingController();
+  ApiLupaPassword apiLupaPassword = Get.put(ApiLupaPassword());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +69,7 @@ class _LayoutLupaPasswordState extends State<LayoutLupaPassword> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: InputVersiSatu(
                 tipeInput: TextInputType.phone,
-                controller: noTeleponController,
+                controller: apiLupaPassword.telephoneController,
                 iconInput: const Icon(
                   Icons.phone_rounded,
                   size: 30,
@@ -84,8 +85,7 @@ class _LayoutLupaPasswordState extends State<LayoutLupaPassword> {
               padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
               child: InkWell(
                 onTap: () {
-                  //kirim OTP
-                  Get.to(const LayoutLupaPasswordOTP());
+                  apiLupaPassword.lupaPass(context);
                 },
                 child: Container(
                   decoration: BoxDecoration(
