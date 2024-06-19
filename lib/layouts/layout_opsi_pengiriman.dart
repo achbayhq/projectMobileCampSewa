@@ -1,9 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/alamat_opsi_pengiriman.dart';
 import 'package:project_camp_sewa/components/button/opsi_pengiriman.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
+import 'package:project_camp_sewa/models/alamat_model.dart';
+import 'package:project_camp_sewa/services/api_data_user.dart';
+import 'package:project_camp_sewa/services/api_transaksi.dart';
 
 class LayoutOpsiPengiriman extends StatefulWidget {
   const LayoutOpsiPengiriman({super.key});
@@ -13,8 +17,8 @@ class LayoutOpsiPengiriman extends StatefulWidget {
 }
 
 class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
-  TextEditingController alamatStoreController = TextEditingController();
-  TextEditingController alamatUserController = TextEditingController();
+  ApiTransaksi apiTransaksi = Get.put(ApiTransaksi());
+  ApiDataUser apiDataUser = Get.put(ApiDataUser());
   String selectedImageAntar = "assets/icons/selected-opsi-antar.png";
   String defaultImageAntar = "assets/icons/default-opsi-antar.png";
   String selectedImageAmbil = "assets/icons/selected-opsi-ambil.png";
@@ -23,7 +27,70 @@ class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
   Color defaultBgColor = Colors.white;
   Color selectedTextColor = Colors.white;
   Color defaultTextColor = Colors.black;
-  String selectedOption = "antar";
+  String selectedOption = "ambil";
+  RxString alamatUser = "Sedang Mengambil Alamat...".obs;
+  RxString alamatToko = "Sedang Mengambil Alamat...".obs;
+  String? idToko;
+
+  @override
+  void initState() {
+    super.initState();
+    getAlamatTokoOpsiPengiriman();
+    getAlamatUserOpsiPengiriman();
+  }
+
+  Future<void> getAlamatTokoOpsiPengiriman() async {
+    final arguments = await Get.arguments as Map<String, dynamic>;
+    idToko = arguments['idToko'];
+    await apiTransaksi.getAlamatToko(context, idToko!);
+    final alamat = apiTransaksi.alamatTokoCheckout.value;
+    if (alamat != null) {
+      double longitudeToko = double.parse(alamat.longitude);
+      double latitudeToko = double.parse(alamat.latitude);
+      String convertedAlamat = await convertAlamat(latitudeToko, longitudeToko);
+      alamatToko.value = convertedAlamat;
+    }
+  }
+
+  Future<void> getAlamatUserOpsiPengiriman() async {
+    await apiDataUser.getListAlamatUser(context);
+    AlamatUserModel alamat = apiDataUser.listAlamatUser[0];
+    double longitude = double.parse(alamat.longitude);
+    double latitude = double.parse(alamat.latitude);
+    String convertedAlamat = await convertAlamat(latitude, longitude);
+    alamatUser.value = convertedAlamat;
+  }
+
+  Future<String> convertAlamat(double latitude, double longitude) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(latitude, longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String jalan = placemark.street ?? '';
+      String postalCode = placemark.postalCode ?? '';
+      String kecamatan = placemark.subLocality ?? '';
+      String kabupaten = placemark.locality ?? '';
+      String provinsi = placemark.administrativeArea ?? '';
+      String alamat = "$jalan, $kecamatan, $kabupaten, $provinsi, $postalCode";
+      return alamat;
+    } else {
+      const snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: CustomSnackBar(
+            sukses: false,
+            teks: "Tidak bisa Mengkonversi koordinat alamat anda",
+          ));
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      return "";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,26 +213,24 @@ class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
             const SizedBox(
               height: 25,
             ),
-            AlamatOpsiPengiriman(
+            Obx(() => AlamatOpsiPengiriman(
               opsi: "Alamat Pengiriman",
-              alamat:
-                  "Perumahan Mastrip, Blok F50, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia",
+              alamat: alamatUser.value,
               keteranganKirim:
                   "Barang akan dikirim sesuai dengan tanggal yang ditentukan",
               opacity: selectedOption == "antar" ? 1 : 0.5,
               edit: selectedOption == "antar" ? true : false,
               checklist: selectedOption == "antar" ? true : false,
-            ),
-            AlamatOpsiPengiriman(
+            ),),
+            Obx(() => AlamatOpsiPengiriman(
               opsi: "Alamat Store",
-              alamat:
-                  "Rumah Outdoor  Jl. Sumatra XIII No.20, Tegal Boto Lor, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia",
+              alamat: alamatToko.value,
               keteranganKirim:
                   "Barang akan dikirim sesuai dengan tanggal yang ditentukan",
               opacity: selectedOption == "ambil" ? 1 : 0.5,
               edit: false,
               checklist: selectedOption == "ambil" ? true : false,
-            ),
+            ),),
             Container(
               height: 1.2,
               color: Colors.black.withOpacity(0.25),
@@ -179,10 +244,33 @@ class _LayoutOpsiPengirimanState extends State<LayoutOpsiPengiriman> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               child: InkWell(
                 onTap: () {
-                  Get.back(
-                      result: selectedOption == "antar"   //ini nanti alamatnya ngambil dari api lalu dimasukin disini
-                          ? {'selectedOption':"Antar Ke Alamatmu" ,'alamat': "Perumahan Mastrip, Blok F50, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia"}
-                          : {'selectedOption':"Ambil di Tempat" ,'alamat': "Rumah Outdoor  Jl. Sumatra XIII No.20, Tegal Boto Lor, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia"});
+                  if (selectedOption == "antar") {
+                    const snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: CustomSnackBar(
+                          sukses: false,
+                          title: "Fitur Segera Tersedia",
+                          teks: "Maaf Fitur Pengantaran Belum Tersedia",
+                        ));
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar);
+                  } else {
+                    Get.back(
+                        result: selectedOption ==
+                                "antar" //ini nanti alamatnya ngambil dari api lalu dimasukin disini
+                            ? {
+                                'selectedOption': "Antar Ke Alamatmu",
+                                'alamat': alamatUser.value
+                              }
+                            : {
+                                'selectedOption': "Ambil di Tempat",
+                                'alamat': alamatToko.value
+                              });
+                  }
                 },
                 child: Container(
                   decoration: BoxDecoration(

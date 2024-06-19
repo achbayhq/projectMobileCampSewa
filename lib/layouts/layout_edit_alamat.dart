@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
+import 'package:project_camp_sewa/models/user.dart';
+import 'package:project_camp_sewa/services/api_data_user.dart';
 
 class LayoutEditAlamat extends StatefulWidget {
   final bool edit;
+  final String? idAlamat;
   final String? namaLengkap;
   final String? noTelepon;
-  final String? alamat;
+  final String? longitude;
+  final String? latitude;
   final String? detailAlamat;
   final String? ditandaiSebagai;
   const LayoutEditAlamat(
       {super.key,
       required this.edit,
+      this.idAlamat,
       this.namaLengkap,
       this.noTelepon,
-      this.alamat,
+      this.longitude,
+      this.latitude,
       this.detailAlamat,
       this.ditandaiSebagai});
 
@@ -23,20 +32,29 @@ class LayoutEditAlamat extends StatefulWidget {
 }
 
 class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
+  ApiDataUser apiDataUser = Get.put(ApiDataUser());
   TextEditingController namaLengkapController = TextEditingController();
   TextEditingController noTeleponController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
-  TextEditingController detailAlamatController = TextEditingController();
-  String ditandaiSebagai = "rumah";
+  String ditandaiSebagai = "Rumah";
+  String? latitude;
+  String? longitude;
 
   @override
   void initState() {
     if (widget.edit) {
       namaLengkapController.text = widget.namaLengkap ?? "";
       noTeleponController.text = widget.noTelepon ?? "";
-      alamatController.text = widget.alamat ?? "";
-      detailAlamatController.text = widget.detailAlamat ?? "";
-      ditandaiSebagai = widget.ditandaiSebagai ?? "rumah";
+      latitude = widget.latitude;
+      longitude = widget.longitude;
+      convertAlamat(latitude!, longitude!);
+      apiDataUser.detailAlamatController.text = widget.detailAlamat ?? "";
+      ditandaiSebagai = widget.ditandaiSebagai ?? "Rumah";
+    } else {
+      apiDataUser.getDataUser(context);
+      User? data = apiDataUser.dataUser.value;
+      namaLengkapController.text = data!.name!;
+      noTeleponController.text = data.nomorTelephone!;
     }
     super.initState();
   }
@@ -46,8 +64,80 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
     namaLengkapController.dispose();
     noTeleponController.dispose();
     alamatController.dispose();
-    detailAlamatController.dispose();
     super.dispose();
+  }
+
+  void getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    } else if (permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    latitude = position.latitude.toString();
+    longitude = position.longitude.toString();
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String jalan = placemark.street ?? '';
+      String postalCode = placemark.postalCode ?? '';
+      String kecamatan = placemark.subLocality ?? '';
+      String kabupaten = placemark.locality ?? '';
+      String provinsi = placemark.administrativeArea ?? '';
+      alamatController.text =
+          "$jalan, $kecamatan, $kabupaten, $provinsi, $postalCode";
+    } else {
+      const snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: CustomSnackBar(
+            sukses: false,
+            teks: "Tidak bisa Mengkonversi koordinat alamat anda",
+          ));
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    }
+  }
+
+  void convertAlamat(String strLatitude, String strLongitude) async {
+    double latitude = double.parse(strLatitude);
+    double longitude = double.parse(strLongitude);
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(latitude, longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String jalan = placemark.street ?? '';
+      String postalCode = placemark.postalCode ?? '';
+      String kecamatan = placemark.subLocality ?? '';
+      String kabupaten = placemark.locality ?? '';
+      String provinsi = placemark.administrativeArea ?? '';
+      String alamat = "$jalan, $kecamatan, $kabupaten, $provinsi, $postalCode";
+      alamatController.text = alamat;
+    } else {
+      const snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: CustomSnackBar(
+            sukses: false,
+            teks: "Tidak bisa Mengkonversi koordinat alamat anda",
+          ));
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    }
   }
 
   @override
@@ -110,40 +200,47 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                         border: Border.all(color: Colors.black, width: 1.3),
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 4),
                       child: TextField(
                         controller: namaLengkapController,
                         decoration: InputDecoration(
                             hintText: "Nama Lengkap",
+                            enabled: false,
                             hintStyle: GoogleFonts.poppins(
                                 fontSize: 14.5, fontWeight: FontWeight.w500),
                             border: InputBorder.none),
                         style: GoogleFonts.poppins(
-                            fontSize: 14.5, fontWeight: FontWeight.w500),
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Container(
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 1.3),
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 5),
                       child: TextField(
                         controller: noTeleponController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                             hintText: "Nomor Telepon Aktif",
+                            enabled: false,
                             hintStyle: GoogleFonts.poppins(
                                 fontSize: 14.5, fontWeight: FontWeight.w500),
                             border: InputBorder.none),
                         style: GoogleFonts.poppins(
-                            fontSize: 14.5, fontWeight: FontWeight.w500),
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                     ),
                   ),
@@ -161,66 +258,91 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 1.3),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  //pilih alamat
-                                },
-                                child: TextField(
-                                  controller: alamatController,
-                                  enabled: false,
-                                  maxLines: null,
-                                  decoration: InputDecoration(
-                                      hintText:
-                                          "Provinsi, Kota, Kecamatan, Kode Pos",
-                                      hintStyle: GoogleFonts.poppins(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500),
-                                      border: InputBorder.none),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black, width: 1.3),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              child: TextField(
+                                controller: alamatController,
+                                enabled: false,
+                                maxLines: null,
+                                decoration: InputDecoration(
+                                    hintText:
+                                        "Provinsi, Kota, Kecamatan, Kode Pos",
+                                    hintStyle: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500),
+                                    border: InputBorder.none),
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black),
+                              )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5),
+                        child: InkWell(
+                          onTap: () {
+                            //get location
+                            getLocation();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: const Color(0xFF010935),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 8),
+                                child: Text(
+                                  "Ambil\nLokasimu",
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
                                   style: GoogleFonts.poppins(
-                                      fontSize: 13, fontWeight: FontWeight.w500),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white),
                                 ),
                               ),
                             ),
-                            const Icon(
-                              Icons.navigate_next_rounded,
-                              size: 25,
-                              color: Colors.black,
-                            )
-                          ],
-                        )),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Container(
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 1.3),
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 5),
                       child: TextField(
-                        controller: detailAlamatController,
+                        controller: apiDataUser.detailAlamatController,
                         keyboardType: TextInputType.text,
                         maxLines: 3,
                         decoration: InputDecoration(
                             hintText:
                                 "Detail Lainnya (Contoh: {Nama Jalan, Blok, No Rumah)",
                             hintStyle: GoogleFonts.poppins(
-                                fontSize: 14.5, fontWeight: FontWeight.w500),
+                                fontSize: 14, fontWeight: FontWeight.w500),
                             border: InputBorder.none),
                         style: GoogleFonts.poppins(
-                            fontSize: 14.5, fontWeight: FontWeight.w500),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                     ),
                   ),
@@ -245,7 +367,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                     InkWell(
                       onTap: () {
                         setState(() {
-                          ditandaiSebagai = "rumah";
+                          ditandaiSebagai = "Rumah";
                         });
                       },
                       child: Container(
@@ -254,7 +376,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black, width: 1.5),
                           borderRadius: BorderRadius.circular(15),
-                          color: ditandaiSebagai == "rumah"
+                          color: ditandaiSebagai == "Rumah"
                               ? const Color(0xFF010935)
                               : Colors.white,
                         ),
@@ -262,7 +384,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              ditandaiSebagai == "rumah"
+                              ditandaiSebagai == "Rumah"
                                   ? "assets/icons/alamat-home-selected.png"
                                   : "assets/icons/alamat-home.png",
                               scale: 2,
@@ -272,7 +394,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                               style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: ditandaiSebagai == "rumah"
+                                  color: ditandaiSebagai == "Rumah"
                                       ? Colors.white
                                       : Colors.black),
                             ),
@@ -283,7 +405,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                     InkWell(
                       onTap: () {
                         setState(() {
-                          ditandaiSebagai = "kantor";
+                          ditandaiSebagai = "Kantor";
                         });
                       },
                       child: Container(
@@ -292,7 +414,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black, width: 1.5),
                           borderRadius: BorderRadius.circular(15),
-                          color: ditandaiSebagai == "kantor"
+                          color: ditandaiSebagai == "Kantor"
                               ? const Color(0xFF010935)
                               : Colors.white,
                         ),
@@ -300,7 +422,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              ditandaiSebagai == "kantor"
+                              ditandaiSebagai == "Kantor"
                                   ? "assets/icons/alamat-office-selected.png"
                                   : "assets/icons/alamat-kantor.png",
                               scale: 2,
@@ -310,7 +432,7 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                               style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: ditandaiSebagai == "kantor"
+                                  color: ditandaiSebagai == "Kantor"
                                       ? Colors.white
                                       : Colors.black),
                             ),
@@ -322,49 +444,101 @@ class _LayoutEditAlamatState extends State<LayoutEditAlamat> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 30, right: 30, top: 35),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color(0xFF010935),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Text(
-                          "Simpan",
-                          style: GoogleFonts.poppins(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white),
+                  child: InkWell(
+                    onTap: () {
+                      if (widget.edit) {
+                        //edit alamat
+                        if (latitude != null && longitude != null) {
+                          apiDataUser.updateAlamatUser(
+                              context,
+                              widget.idAlamat!,
+                              latitude!,
+                              longitude!,
+                              ditandaiSebagai);
+                        } else {
+                          const snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: CustomSnackBar(
+                                sukses: false,
+                                teks: "Latitude dan Longitude Kosong!",
+                              ));
+
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(snackBar);
+                        }
+                      } else {
+                        if (latitude != null && longitude != null) {
+                          apiDataUser.tambahAlamatUser(
+                              context, latitude!, longitude!, ditandaiSebagai);
+                        } else {
+                          const snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: CustomSnackBar(
+                                sukses: false,
+                                teks: "Latitude dan Longitude Kosong!",
+                              ));
+
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(snackBar);
+                        }
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xFF010935),
+                      ),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: Text(
+                            "Simpan",
+                            style: GoogleFonts.poppins(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                widget.edit
-                    ? Padding(
-                        padding:
-                            const EdgeInsets.only(left: 30, right: 30, top: 15 , bottom: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: const Color(0xFFCD1B1B),
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Text(
-                                "Hapus Alamat",
-                                style: GoogleFonts.poppins(
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white),
-                              ),
+                Visibility(
+                  visible: widget.edit,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 30, right: 30, top: 15, bottom: 20),
+                    child: InkWell(
+                      onTap: () {
+                        apiDataUser.deleteAlamatUser(context, widget.idAlamat!);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: const Color(0xFFCD1B1B),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Text(
+                              "Hapus Alamat",
+                              style: GoogleFonts.poppins(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white),
                             ),
                           ),
                         ),
-                      )
-                    : const SizedBox(),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
           ],

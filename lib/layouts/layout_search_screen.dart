@@ -3,6 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:project_camp_sewa/components/card/rekomendasi_cari_card.dart';
+import 'package:project_camp_sewa/models/produk_model.dart';
+import 'package:project_camp_sewa/services/api_produk.dart';
+import 'package:project_camp_sewa/services/api_riwayat_cari.dart';
+import 'package:project_camp_sewa/services/controller_dashboard.dart';
+import 'package:project_camp_sewa/services/controller_search.dart';
 
 class LayoutSearchScreen extends StatefulWidget {
   const LayoutSearchScreen({super.key});
@@ -12,18 +17,24 @@ class LayoutSearchScreen extends StatefulWidget {
 }
 
 class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
+  DashboardController pageController = Get.put(DashboardController());
   TextEditingController searchController = TextEditingController();
-  List riwayatCari = [
-    "Tenda",
-    "Kompor Portabel",
-    "Tas",
-    "Jaket",
-    "Sepatu",
-    "Kacamata",
-    "Sleeping Bag",
-  ];
-  List rekomendasiPencarian = [];
+  TeksSearchController textSearchController = Get.put(TeksSearchController());
+  ApiRiwayatCari apiRiwayatCari = Get.put(ApiRiwayatCari());
+  ApiProduk apiProduk = Get.put(ApiProduk());
+
   bool showAllSearchHistory = false;
+  final FocusNode searchFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    apiRiwayatCari.showRiwayatCari(context);
+  }
+
+  String getFirstWord(String text) {
+    return text.split(' ').first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +114,16 @@ class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: searchController,
+                      onSubmitted: (value) {
+                        if (value.isNotEmpty) {
+                          textSearchController.searchTeks.value = value;
+                          apiProduk.getProduk(context, value, null);
+                          apiRiwayatCari.insertRiwayatCari(context, value);
+                          pageController.setPageIndex(1);
+                          Get.back();
+                        }
+                      },
+                      focusNode: searchFocusNode,
                       decoration: InputDecoration(
                           hintText: "Cari Peralatan...",
                           border: InputBorder.none,
@@ -135,48 +156,91 @@ class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
               ),
             ),
             Container(
-              color: Colors.white,
-              child: ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: (showAllSearchHistory)
-                      ? riwayatCari.length
-                      : (riwayatCari.length > 4)
-                          ? 4
-                          : riwayatCari.length,
-                  itemBuilder: (context, index) => previousSearchsItem(index)),
-            ),
-            if (riwayatCari.length > 4 && !showAllSearchHistory)
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    showAllSearchHistory = true;
-                  });
-                },
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                  child: Container(
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: Text(
-                        'Lihat Semua',
-                        style: GoogleFonts.poppins(
+                color: Colors.white,
+                child: Obx(
+                  () => ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: (showAllSearchHistory)
+                          ? apiRiwayatCari.riwayatCari.length
+                          : (apiRiwayatCari.riwayatCari.length > 4)
+                              ? 4
+                              : apiRiwayatCari.riwayatCari.length,
+                      itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  searchController.clear();
+                                  searchController.text +=
+                                      apiRiwayatCari.riwayatCari[index];
+                                  searchFocusNode.requestFocus();
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Text(apiRiwayatCari.riwayatCari[index],
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black)),
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      apiRiwayatCari.deleteRiwayatCari(context,
+                                          apiRiwayatCari.riwayatCari[index]);
+                                      apiRiwayatCari.showRiwayatCari(context);
+                                    },
+                                    child: Icon(
+                                      MdiIcons.windowClose,
+                                      color: Colors.black,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )),
+                )),
+            Obx(
+              () => Visibility(
+                visible: apiRiwayatCari.riwayatCari.length > 4 &&
+                    !showAllSearchHistory,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      showAllSearchHistory = true;
+                    });
+                  },
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                    child: Container(
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Text(
+                          'Lihat Semua',
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: Colors.black.withOpacity(0.6)),
-                        textAlign: TextAlign.center,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            if (showAllSearchHistory)
-              InkWell(
+            ),
+            Visibility(
+              visible: showAllSearchHistory,
+              child: InkWell(
                 onTap: () {
+                  apiRiwayatCari.deleteRiwayatCari(context, null);
+                  apiRiwayatCari.showRiwayatCari(context);
                   setState(() {
-                    riwayatCari.clear();
                     showAllSearchHistory = false;
                   });
                 },
@@ -190,15 +254,17 @@ class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
                       child: Text(
                         'Hapus semua riwayat',
                         style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.red.shade800.withOpacity(0.8)),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.red.shade800.withOpacity(0.8),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
                 ),
               ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Text(
@@ -212,57 +278,42 @@ class _LayoutSearchScreenState extends State<LayoutSearchScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SizedBox(
-                height: 500,
-                child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.740,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10),
-                    scrollDirection: Axis.vertical,
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      return const RekomendasiCariCard();
-                    }),
+                height: 765,
+                child: Obx(() {
+                  List<ProdukModel> listProduk =
+                      apiProduk.listProdukRekomendasi;
+                  return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.740,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: listProduk.length,
+                      itemBuilder: (context, index) {
+                        ProdukModel list = listProduk[index];
+                        return RekomendasiCariCard(
+                          image: list.image,
+                          namaProduk: list.namaProduk,
+                          rating: list.rating,
+                          aksi: () {
+                            String value = getFirstWord(list.namaProduk);
+                            textSearchController.searchTeks.value = value;
+                            apiProduk.getProduk(context, value, null);
+                            apiRiwayatCari.insertRiwayatCari(context, value);
+                            pageController.setPageIndex(1);
+                            Get.back();
+                          },
+                        );
+                      });
+                }),
               ),
             )
           ])),
         ],
       )),
-    );
-  }
-
-  previousSearchsItem(int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            searchController.clear();
-            searchController.text += riwayatCari[index];
-          });
-        },
-        child: Row(
-          children: [
-            Text(riwayatCari[index],
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black)),
-            const Spacer(),
-            InkWell(
-              onTap: () {
-                riwayatCari.removeAt(index);
-                setState(() {});
-              },
-              child: Icon(
-                MdiIcons.windowClose,
-                color: Colors.black,
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 }

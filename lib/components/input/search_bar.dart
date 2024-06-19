@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MySearchBar extends StatefulWidget {
   final Function()? aksi;
-  final String teks;
+  final RxString teks;
   final BoxBorder? border;
   final Color? backgroundColor;
   final double? iconSize;
@@ -35,9 +36,7 @@ class _MySearchBarState extends State<MySearchBar> {
         Expanded(
           // field cari peralatan
           child: InkWell(
-            onTap: () {
-              widget.aksi;
-            },
+            onTap: widget.aksi,
             child: Container(
               height: 50,
               padding: const EdgeInsets.all(6),
@@ -58,12 +57,17 @@ class _MySearchBarState extends State<MySearchBar> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Text(
-                    widget.teks,
-                    style: GoogleFonts.poppins(
-                        fontSize: widget.fontSize,
-                        fontWeight: FontWeight.w400,
-                        color: widget.fontColor),
+                  Expanded(
+                    child: Obx(
+                      () => Text(
+                        widget.teks.value,
+                        style: GoogleFonts.poppins(
+                            fontSize: widget.fontSize,
+                            fontWeight: FontWeight.w400,
+                            color: widget.fontColor),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
                 ],
               ),

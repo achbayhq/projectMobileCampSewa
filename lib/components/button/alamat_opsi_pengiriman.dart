@@ -72,17 +72,17 @@ class _AlamatOpsiPengirimanState extends State<AlamatOpsiPengiriman> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
             child: Row(
               children: [
                 Column(
                   children: [
                     SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.2,
+                      width: MediaQuery.of(context).size.width / 1.3,
                       child: Text(
                         widget.alamat,
                         style: GoogleFonts.poppins(
-                            fontSize: 12.5,
+                            fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Colors.black.withOpacity(widget.opacity)),
                       ),

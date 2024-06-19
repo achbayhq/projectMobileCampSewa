@@ -1,14 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:project_camp_sewa/components/card/chekout_produk_card.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
 import 'package:project_camp_sewa/layouts/layout_metode_pembayaran.dart';
 import 'package:project_camp_sewa/layouts/layout_opsi_pengiriman.dart';
-import 'package:project_camp_sewa/layouts/layout_pembayaran.dart';
+import 'package:project_camp_sewa/models/keranjang_model.dart';
+import 'package:project_camp_sewa/services/api_transaksi.dart';
+import 'package:project_camp_sewa/services/controller_keranjang.dart';
 
 class LayoutCheckout extends StatefulWidget {
   const LayoutCheckout({super.key});
@@ -18,11 +20,11 @@ class LayoutCheckout extends StatefulWidget {
 }
 
 class _LayoutCheckoutState extends State<LayoutCheckout> {
+  KeranjangController keranjangController = Get.put(KeranjangController());
+  ApiTransaksi apiTransaksi = Get.put(ApiTransaksi());
   String metodeBayar = "Bayar Ditempat";
   String opsiPengiriman =
       "Ambil Ditempat"; //untuk alamat pengirimannya nanti isi alamat store langsung dari API
-  String alamatPengiriman =
-      "Rumah Outdoor  Jl. Sumatra XIII No.20, Tegal Boto Lor, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur, Indonesia";
   String? jenisBank;
   DateTime? tanggalAwal;
   DateTime? tanggalAkhir;
@@ -30,7 +32,84 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
   String? formatedTanggalAwal;
   String? formatedTanggalAkhir;
-  TextEditingController pesanController = TextEditingController();
+  int? totalPembayaran;
+  double? longitudeToko;
+  double? latitudeToko;
+  RxString alamatPengiriman = "sedang mendapatkan alamat...".obs;
+  int? idToko;
+  RxString namaToko = "".obs;
+  String? rekeningBank;
+
+  @override
+  void initState() {
+    super.initState();
+    keranjangController.getSelectedProdukCheckout(context);
+    keranjangController.updateTotalItemKeranjang(context);
+    keranjangController.updateTotalHargaKeranjang(context);
+    loadInitialData();
+  }
+
+  Future<void> loadInitialData() async {
+    await keranjangController.getSelectedProdukCheckout(context);
+
+    final List<Map<String, dynamic>> produkCheckout =
+        keranjangController.selectedProdukCheckout.toList();
+
+    if (produkCheckout.isNotEmpty) {
+      final KeranjangModel keranjang =
+          KeranjangModel.fromMap(produkCheckout[0]);
+      idToko = keranjang.idToko;
+      namaToko.value = keranjang.namaToko;
+      // ignore: use_build_context_synchronously
+      await apiTransaksi.getAlamatToko(context, idToko.toString());
+      final alamat = apiTransaksi.alamatTokoCheckout.value;
+      if (alamat != null) {
+        longitudeToko = double.parse(alamat.longitude);
+        latitudeToko = double.parse(alamat.latitude);
+        String convertedAlamat =
+            await convertAlamat(latitudeToko!, longitudeToko!);
+        alamatPengiriman.value = convertedAlamat;
+      }
+    }
+  }
+
+  Future<String> convertAlamat(double latitude, double longitude) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(latitude, longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String jalan = placemark.street ?? '';
+      String postalCode = placemark.postalCode ?? '';
+      String kecamatan = placemark.subLocality ?? '';
+      String kabupaten = placemark.locality ?? '';
+      String provinsi = placemark.administrativeArea ?? '';
+      String alamat = "$jalan, $kecamatan, $kabupaten, $provinsi, $postalCode";
+      return alamat;
+    } else {
+      const snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: CustomSnackBar(
+            sukses: false,
+            teks: "Tidak bisa Mengkonversi koordinat alamat anda",
+          ));
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      return "";
+    }
+  }
+
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter =
+        NumberFormat.decimalPattern('id'); // Use 'id' for Indonesian locale
+    return formatter.format(number);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,21 +154,52 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
             Expanded(
               child: ListView(
                 children: [
-                  ListView.builder(
-                      itemCount: 3,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => const CheckoutProdukCard(
-                            image: "assets/images/produk1.jpeg",
-                            namaToko: "Abay Store",
-                            namaProduk: "Tenda camp",
-                            variasiWarna: "Biru",
-                            hargaProduk: "25.000",
-                            qtyProduk: "2",
-                          )),
-                  const SizedBox(
-                    height: 3,
+                  Container(
+                    color: const Color(0xFF010935),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 10, right: 5, top: 3, bottom: 3),
+                            child: Image.asset(
+                              "assets/icons/icon-store.png",
+                              scale: 2,
+                            ),
+                          ),
+                          Obx(() => Text(
+                              namaToko.value,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),) 
+                        ],
+                      ),
+                    ),
                   ),
+                  Obx(() {
+                    final List<Map<String, dynamic>> produkCheckout =
+                        keranjangController.selectedProdukCheckout.toList();
+                    return ListView.builder(
+                        itemCount: produkCheckout.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final KeranjangModel keranjang =
+                              KeranjangModel.fromMap(produkCheckout[index]);
+                          return CheckoutProdukCard(
+                            image: keranjang.fotoProduk,
+                            namaProduk: keranjang.namaProduk,
+                            variasiWarna: keranjang.variantWarna,
+                            variasiUkuran: keranjang.variantUkuran,
+                            hargaProduk: keranjang.harga.toString(),
+                            qtyProduk: keranjang.qty.toString(),
+                          );
+                        });
+                  }),
                   InkWell(
                     onTap: () async {
                       final tanggalSewa = await showDateRangePicker(
@@ -104,9 +214,9 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                           tanggalAwal = tanggalSewa.start;
                           tanggalAkhir = tanggalSewa.end;
                           formatedTanggalAwal =
-                              DateFormat('dd-MM-yyyy').format(tanggalAwal!);
+                              DateFormat('yyyy-MM-dd').format(tanggalAwal!);
                           formatedTanggalAkhir =
-                              DateFormat('dd-MM-yyyy').format(tanggalAkhir!);
+                              DateFormat('yyyy-MM-dd').format(tanggalAkhir!);
                         });
                       }
                     },
@@ -118,7 +228,7 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                         color: Colors.white,
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -204,12 +314,13 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                   ),
                   InkWell(
                     onTap: () async {
-                      final pilihanPengiriman =
-                          await Get.to(const LayoutOpsiPengiriman());
+                      final pilihanPengiriman = await Get.to(
+                          const LayoutOpsiPengiriman(),
+                          arguments: {'idToko': idToko.toString()});
                       setState(() {
                         if (pilihanPengiriman != null) {
                           opsiPengiriman = pilihanPengiriman['selectedOption'];
-                          alamatPengiriman = pilihanPengiriman['alamat'];
+                          alamatPengiriman.value = pilihanPengiriman['alamat'];
                         }
                       });
                     },
@@ -265,14 +376,16 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                               ],
                             ),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width / 1.25,
-                              child: Text(
-                                //alamat
-                                alamatPengiriman,
-                                style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
+                              width: MediaQuery.of(context).size.width / 1.4,
+                              child: Obx(
+                                () => Text(
+                                  //alamat
+                                  alamatPengiriman.value,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black),
+                                ),
                               ),
                             ),
                             const SizedBox(
@@ -326,7 +439,7 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                               height: 45,
                               width: MediaQuery.of(context).size.width / 1.3,
                               child: TextField(
-                                controller: pesanController,
+                                controller: apiTransaksi.pesanController,
                                 textAlign: TextAlign.end,
                                 style: GoogleFonts.poppins(
                                     fontSize: 11, fontWeight: FontWeight.w400),
@@ -365,12 +478,15 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                                 color: Colors.black),
                           ),
                           const Spacer(),
-                          Text(
-                            "3", //total produk
-                            style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black),
+                          Obx(
+                            () => Text(
+                              keranjangController.totalItemKeranjang.value
+                                  .toString(), //total produk
+                              style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black),
+                            ),
                           ),
                           Text(
                             " Produk",
@@ -385,12 +501,14 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                   ),
                   InkWell(
                     onTap: () async {
-                      final pilihanPembayaran =
-                          await Get.to(const LayoutMetodePembayaran());
+                      final pilihanPembayaran = await Get.to(
+                          const LayoutMetodePembayaran(),
+                          arguments: {'idToko': idToko.toString()});
                       setState(() {
                         if (pilihanPembayaran != null) {
                           metodeBayar = pilihanPembayaran["metodeBayar"];
                           jenisBank = pilihanPembayaran["jenisBank"];
+                          rekeningBank = pilihanPembayaran["rekeningBank"];
                         }
                       });
                     },
@@ -509,12 +627,23 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                               fontWeight: FontWeight.w500,
                               color: Colors.black),
                         ),
-                        Text(
-                          "120.000", //sub total harga
-                          style: GoogleFonts.poppins(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black),
+                        Obx(
+                          () {
+                            int subTotal =
+                                keranjangController.totalHargaKeranjang.value;
+                            int durasi = durasiSewa.duration.inDays == 0
+                                ? 1
+                                : durasiSewa.duration.inDays;
+                            int grandTotal = subTotal * durasi;
+                            return Text(
+                              formatCurrency(
+                                  grandTotal.toString()), //sub total harga
+                              style: GoogleFonts.poppins(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black),
+                            );
+                          },
                         ),
                         Text(
                           ",00",
@@ -584,13 +713,24 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
                               fontWeight: FontWeight.w700,
                               color: Colors.black),
                         ),
-                        Text(
-                          "121.000", //total pembayaran
-                          style: GoogleFonts.poppins(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
-                        ),
+                        Obx(() {
+                          int subTotal =
+                              keranjangController.totalHargaKeranjang.value;
+                          int durasi = durasiSewa.duration.inDays == 0
+                              ? 1
+                              : durasiSewa.duration.inDays;
+                          int grandTotal = subTotal * durasi;
+                          totalPembayaran = grandTotal + 1000;
+                          return Text(
+                            totalPembayaran != null
+                                ? formatCurrency(totalPembayaran.toString())
+                                : "0.00", //total pembayaran
+                            style: GoogleFonts.poppins(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black),
+                          );
+                        }),
                         Text(
                           ",00",
                           style: GoogleFonts.poppins(
@@ -619,7 +759,34 @@ class _LayoutCheckoutState extends State<LayoutCheckout> {
               child: InkWell(
                 onTap: () {
                   //button checkout
-                  Get.to(const LayoutPembayaran());
+                  //jangan lupa ngecek apakah udah menginputkan tanggal sewanya
+                  if (tanggalAwal != null && tanggalAkhir != null) {
+                    String metode =
+                        metodeBayar == "Bayar Ditempat" ? "COD" : "Transfer";
+                    apiTransaksi.transaksiCheckout(
+                        context,
+                        formatedTanggalAwal!,
+                        formatedTanggalAkhir!,
+                        metode,
+                        totalPembayaran.toString(),
+                        jenisBank,
+                        rekeningBank!,
+                        idToko);
+                  } else {
+                    const snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: CustomSnackBar(
+                          sukses: false,
+                          title: "Notifikasi",
+                          teks: "Masukkan Tanggal Sewa Terlebih Dahulu",
+                        ));
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar);
+                  }
                 },
                 child: Container(
                   height: 58,

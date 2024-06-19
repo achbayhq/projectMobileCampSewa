@@ -26,11 +26,11 @@ class _RiwayatScreenState extends State<RiwayatScreen>
   ];
 
   final List<Widget> _bodyTabs = [
-     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatData(),),
+     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatBelumBayar(),),
      LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatPengambilanData(),),
-     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatData(),),
-     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatPengambilanData(),),
-     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatData(),),
+     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatBerlangsung(),),
+     LayoutRiwayat(riwayatData: DummyProductApiResponse.getRiwayatSelesai()),
+     const LayoutRiwayat(riwayatData: []),
   ];
 
   @override

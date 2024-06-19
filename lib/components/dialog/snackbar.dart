@@ -62,7 +62,7 @@ class _CustomSnackBarState extends State<CustomSnackBar> {
             ),
             IconButton(
                 onPressed: () {
-                  Get.back();
+                  //Get.back();
                 },
                 icon: const Icon(
                   Icons.close_rounded,

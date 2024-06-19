@@ -4,11 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 class KategoriIcon extends StatelessWidget {
   final Function()? aksi;
   final String title;
-  final Color? backgroundColor;
-  final Color? teksColor;
+  final bool selected;
 
   const KategoriIcon(
-      {super.key, this.aksi, required this.title, this.backgroundColor, this.teksColor});
+      {super.key,
+      this.aksi,
+      required this.title,
+      this.selected = false});
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +27,19 @@ class KategoriIcon extends StatelessWidget {
             child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: backgroundColor,
+                  border: Border.all(color: selected ? Colors.transparent :Colors.black.withOpacity(0.3)),
+                  color: selected ? const Color(0xFF242569) : const Color(0xFFE3E3E3),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Center(
                       child: Text(
                     title,
                     style: GoogleFonts.poppins(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        color: teksColor),
+                        color: selected ? Colors.white : Colors.black),
                   )),
                 )),
           ),

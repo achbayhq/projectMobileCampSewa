@@ -28,7 +28,6 @@ class _SplashScreen extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     loadUserData().then((_) {
       Future.delayed(const Duration(seconds: 2), () {
         // Navigator.of(context).pushReplacement(
@@ -60,7 +59,7 @@ class _SplashScreen extends State<SplashScreen>
       decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("assets/images/background-splash-screen.png"),
-              fit: BoxFit.fill)),
+              fit: BoxFit.cover)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

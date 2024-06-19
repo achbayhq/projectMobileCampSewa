@@ -1,11 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:project_camp_sewa/components/card/group_produk_keranjang.dart';
-import 'package:project_camp_sewa/components/card/keranjang_card.dart';
+import 'package:project_camp_sewa/components/dialog/alert_dialog.dart';
 import 'package:project_camp_sewa/layouts/layout_checkout.dart';
+import 'package:project_camp_sewa/services/controller_keranjang.dart';
 
 class LayoutKeranjang extends StatefulWidget {
   const LayoutKeranjang({super.key});
@@ -15,7 +15,23 @@ class LayoutKeranjang extends StatefulWidget {
 }
 
 class _LayoutKeranjangState extends State<LayoutKeranjang> {
-  List keranjang = [];
+  KeranjangController keranjangController = Get.put(KeranjangController());
+
+  @override
+  void initState() {
+    super.initState();
+    keranjangController.getUniqueStores(context);
+    keranjangController.updateTotalHargaKeranjang(context);
+    keranjangController.updateTotalItemKeranjang(context);
+    keranjangController.getSelectedTokoCheckout(context);
+  }
+
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter =
+        NumberFormat.decimalPattern('id'); // Use 'id' for Indonesian locale
+    return formatter.format(number);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,17 +88,23 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ListView.separated(
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) =>
-                            const GroupProdukKeranjang(
-                          namaToko: "BayHq Shop",
-                        ),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          height: 8,
-                        ),
-                        itemCount: 3,
-                      ),
+                      child: Obx(() {
+                        return ListView.separated(
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            final store =
+                                keranjangController.uniqueStores[index];
+                            return GroupProdukKeranjang(
+                              namaToko: store['nama_toko'],
+                              idToko: store['id_toko'],
+                            );
+                          },
+                          separatorBuilder: (context, index) => const SizedBox(
+                            height: 8,
+                          ),
+                          itemCount: keranjangController.uniqueStores.length,
+                        );
+                      }),
                     ),
                   ),
                 ],
@@ -106,11 +128,14 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                               fontSize: 14.5, fontWeight: FontWeight.w700),
                         ),
                         const Spacer(),
-                        Text(
-                          "10", //total item
-                          style: GoogleFonts.poppins(
-                              fontSize: 14.5, fontWeight: FontWeight.w700),
-                        ),
+                        Obx(() {
+                          return Text(
+                            keranjangController.totalItemKeranjang.value
+                                .toString(), //total item
+                            style: GoogleFonts.poppins(
+                                fontSize: 14.5, fontWeight: FontWeight.w700),
+                          );
+                        }),
                         Text(
                           " Item",
                           style: GoogleFonts.poppins(
@@ -135,11 +160,15 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                           style: GoogleFonts.poppins(
                               fontSize: 14.5, fontWeight: FontWeight.w700),
                         ),
-                        Text(
-                          "200.000", //total harga
-                          style: GoogleFonts.poppins(
-                              fontSize: 14.5, fontWeight: FontWeight.w700),
-                        ),
+                        Obx(() {
+                          return Text(
+                            formatCurrency(keranjangController
+                                .totalHargaKeranjang.value
+                                .toString()), //total harga
+                            style: GoogleFonts.poppins(
+                                fontSize: 14.5, fontWeight: FontWeight.w700),
+                          );
+                        }),
                         Text(
                           ",00/hari",
                           style: GoogleFonts.poppins(
@@ -152,8 +181,26 @@ class _LayoutKeranjangState extends State<LayoutKeranjang> {
                     height: 8,
                   ),
                   InkWell(
-                    onTap: () {
-                      Get.to(const LayoutCheckout());
+                    onTap: () async{
+                      await keranjangController.getSelectedTokoCheckout(context);
+                      int totalToko =
+                          keranjangController.totalSelectedTokoCheckout.value;
+                      if (totalToko == 1) {
+                        Get.to(const LayoutCheckout());
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return const AlertDialog(
+                                backgroundColor: Colors.transparent,
+                                content: CustomAlertDialog(
+                                    sukses: false,
+                                    title: "Maaf Atas Ketidaknyamanannya",
+                                    teks:
+                                        "Anda Hanya Bisa Checkout Produk Pada 1 Toko Yang Sama"),
+                              );
+                            });
+                      }
                     },
                     child: Container(
                       height: 55,

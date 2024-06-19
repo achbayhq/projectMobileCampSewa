@@ -41,6 +41,6 @@ class Main extends StatelessWidget {
     return const GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Marketplace KampSewa Indonesia",
-        home: LoginScreen());
+        home: SplashScreen());
   }
 }

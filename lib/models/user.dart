@@ -3,15 +3,27 @@ class User {
   String? name;
   String? email;
   String? image;
-  String? token;
+  String? nomorTelephone;
+  String? tanggalLahir;
+  String? namaStore;
 
-  User({this.id, this.name, this.email, this.image, this.token});
+  User(
+      {this.id,
+      this.name,
+      this.email,
+      this.image,
+      this.nomorTelephone,
+      this.namaStore,
+      this.tanggalLahir});
 
-  User.fromJson(Map<String, dynamic> json) {
-    id = json['user']['id'];
-    name = json['user']['name'];
-    email = json['user']['email'];
-    image = json['user']['image'];
-    token = json['token'];
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+    id : json['id'],
+    name : json['name'],
+    email : json['email'],
+    image : json['foto'],
+    nomorTelephone : json['nomor_telephone'],
+    tanggalLahir : json['tanggal_lahir'],
+    namaStore : json['name_store']);
   }
 }

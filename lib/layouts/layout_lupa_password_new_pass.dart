@@ -18,6 +18,7 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
   Widget build(BuildContext context) {
     final dataKiriman = Get.arguments as Map<String, dynamic>;
     String noTelephone = dataKiriman['nomor_telephone'];
+    bool lupaPass = dataKiriman['lupa_password'];
     return Scaffold(
       body: SafeArea(
           child: Container(
@@ -146,7 +147,7 @@ class _LayoutLupaPasswordNewPassState extends State<LayoutLupaPasswordNewPass> {
                   child: InkWell(
                     onTap: () {
                       //konfirmasi
-                      apiLupaPassword.lupaPassResetPass(context, noTelephone);
+                      apiLupaPassword.lupaPassResetPass(context, noTelephone, lupaPass);
                     },
                     child: Container(
                       decoration: BoxDecoration(

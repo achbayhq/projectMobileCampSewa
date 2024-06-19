@@ -2,14 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:project_camp_sewa/components/bottomsheet/bottom_sheet_produk.dart';
 import 'package:project_camp_sewa/components/card/berita_dash_card.dart';
 import 'package:project_camp_sewa/components/button/icon_kategori.dart';
 import 'package:project_camp_sewa/components/card/produk_terlaris_card.dart';
 import 'package:project_camp_sewa/components/card/wisata_dash_card.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
+import 'package:project_camp_sewa/constants/api_endpoint.dart';
+import 'package:project_camp_sewa/constants/database_helper.dart';
+import 'package:project_camp_sewa/layouts/layout_detail_product.dart';
 import 'package:project_camp_sewa/layouts/layout_keranjang.dart';
 import 'package:project_camp_sewa/layouts/layout_search_screen.dart';
-import 'package:project_camp_sewa/screens/screen_login.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:project_camp_sewa/models/api_response.dart';
+import 'package:project_camp_sewa/models/berita_model.dart';
+import 'package:project_camp_sewa/models/iklan_model.dart';
+import 'package:project_camp_sewa/models/produk_model.dart';
+import 'package:project_camp_sewa/models/user.dart';
+import 'package:project_camp_sewa/models/wisata_model.dart';
+import 'package:project_camp_sewa/services/api_data_user.dart';
+import 'package:project_camp_sewa/services/api_iklan.dart';
+import 'package:project_camp_sewa/services/api_produk.dart';
+import 'package:project_camp_sewa/services/controller_dashboard.dart';
 
 class LayoutDashboard extends StatefulWidget {
   const LayoutDashboard({super.key});
@@ -19,16 +32,26 @@ class LayoutDashboard extends StatefulWidget {
 }
 
 class _LayoutDashboardState extends State<LayoutDashboard> {
-  List kategoriIcon = ["Tenda", "Pakaian", "Tas & Sepatu", "Perlengkapan"];
+  ApiDataUser apiDataUser = Get.put(ApiDataUser());
+  ApiIklan apiIklan = Get.put(ApiIklan());
+  ApiProduk apiProduk = Get.put(ApiProduk());
+  DashboardController pageController = Get.put(DashboardController());
 
-  List imageList = [
-    {"id": 1, "image_path": 'assets/images/bg_login.jpg'},
-    {"id": 2, "image_path": 'assets/images/bg-onboard-berita.jpeg'},
-    {"id": 3, "image_path": 'assets/images/bg-onboard-wisata.jpeg'},
-    {"id": 4, "image_path": 'assets/images/bg-onboard-berita.jpeg'}
-  ];
+  late List<WisataModel> wisataList;
+  late List<BeritaModel> beritaList;
+  List kategoriIcon = ["Tenda", "Pakaian", "Tas & Sepatu", "Perlengkapan"];
   final CarouselController carouselController = CarouselController();
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    apiDataUser.getDataUser(context);
+    apiIklan.getIklan(context);
+    apiProduk.getProdukRatingTertinggi(context);
+    wisataList = DummyProductApiResponse.getDataWisata();
+    beritaList = DummyProductApiResponse.getDataBerita();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,22 +73,47 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
               children: [
                 Row(
                   children: [
-                    const CircleAvatar(
-                      //photo profile
-                      radius: 30,
-                      backgroundImage: AssetImage("assets/images/pp.jpg"),
-                    ),
+                    Obx(() {
+                      final User? dataUser = apiDataUser.dataUser.value;
+                      if (dataUser != null) {
+                        return CircleAvatar(
+                          //photo profile
+                          radius: 30,
+                          backgroundImage: NetworkImage(ApiEndpoints.baseUrl +
+                              ApiEndpoints.authendpoints.getFotoProfile +
+                              dataUser.image!),
+                        );
+                      } else {
+                        return const CircleAvatar(
+                          //photo profile
+                          radius: 30,
+                          backgroundImage:
+                              AssetImage("assets/images/error-pp.jpg"),
+                        );
+                      }
+                    }),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           //nama user
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            "Achmad Bayhaqi",
-                            style: GoogleFonts.poppins(
-                                fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
+                          child: Obx(() {
+                            final User? dataUser = apiDataUser.dataUser.value;
+                            if (dataUser != null) {
+                              return Text(
+                                dataUser.name!,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                              );
+                            } else {
+                              return Text(
+                                "Unknown",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                              );
+                            }
+                          }),
                         ),
                         const SizedBox(
                           height: 2,
@@ -95,10 +143,20 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     InkWell(
                       onTap: () async {
                         //fungsi klik notification
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.remove('token');
-                        await prefs.remove('userId');
-                        Get.to(const LoginScreen());
+                        //DatabaseHelper.instance.deleteAllKeranjang(context);
+                        const snackBar = SnackBar(
+                            elevation: 0,
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.transparent,
+                            content: CustomSnackBar(
+                              sukses: false,
+                              title: "Coming Soon",
+                              teks: "Fitur Notification Akan Tersedia Segera",
+                            ));
+
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar);
                       },
                       child: Container(
                         width: 40,
@@ -221,59 +279,66 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                       onTap: () {
                         //tap iklannya maka akan menampilkan barang/toko pengiklan
                       },
-                      child: CarouselSlider(
-                        //iklannya disini
-                        items: imageList.map((item) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                20), // Atur radius lengkungan iklannya
-                            child: Image.asset(
-                              item['image_path'],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                          );
-                        }).toList(),
-                        carouselController: carouselController,
-                        options: CarouselOptions(
-                          scrollPhysics: const BouncingScrollPhysics(),
-                          autoPlay: true,
-                          aspectRatio: 2,
-                          viewportFraction: 1,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              currentIndex = index;
-                            });
-                          },
-                        ),
-                      ),
+                      child: Obx(() {
+                        List<IklanModel> iklan = apiIklan.listIklan;
+                        return CarouselSlider(
+                          //iklannya disini
+                          items: iklan.map((item) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  20), // Atur radius lengkungan iklannya
+                              child: Image.network(
+                                ApiEndpoints.baseUrl +
+                                    ApiEndpoints.authendpoints.getImageIklan +
+                                    item.poster,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
+                            );
+                          }).toList(),
+                          carouselController: carouselController,
+                          options: CarouselOptions(
+                            scrollPhysics: const BouncingScrollPhysics(),
+                            autoPlay: true,
+                            aspectRatio: 2,
+                            viewportFraction: 1,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          ),
+                        );
+                      }),
                     ),
                     Positioned(
-                      bottom: 10,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: imageList.asMap().entries.map((entry) {
-                          return GestureDetector(
-                            onTap: () =>
-                                carouselController.animateToPage(entry.key),
-                            child: Container(
-                              width: currentIndex == entry.key ? 17 : 7,
-                              height: 7.0,
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 3.0,
-                              ),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: currentIndex == entry.key
-                                      ? Colors.amber
-                                      : Colors.green),
-                            ),
+                        bottom: 10,
+                        left: 0,
+                        right: 0,
+                        child: Obx(() {
+                          List<IklanModel> iklan = apiIklan.listIklan;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: iklan.asMap().entries.map((entry) {
+                              return GestureDetector(
+                                onTap: () =>
+                                    carouselController.animateToPage(entry.key),
+                                child: Container(
+                                  width: currentIndex == entry.key ? 17 : 7,
+                                  height: 7.0,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3.0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: currentIndex == entry.key
+                                          ? Colors.white
+                                          : const Color(0xFF010935)),
+                                ),
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      ),
-                    ),
+                        })),
                   ]),
                 ),
                 const SizedBox(
@@ -301,8 +366,7 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) => KategoriIcon(
                         title: kategoriIcon[index],
-                        backgroundColor: Colors.black,
-                        teksColor: Colors.white,
+                        selected: true,
                         aksi: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -329,13 +393,21 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                         style: GoogleFonts.poppins(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                      Text(
-                        "Lihat Semua",
-                        style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFFBBBBBB),
-                            decoration: TextDecoration.underline),
+                      InkWell(
+                        onTap: () {
+                          //lihat semua rating tertinggi
+                          apiProduk.getProduk(
+                                  context, null, "Rekomendasi");
+                          pageController.setPageIndex(1);
+                        },
+                        child: Text(
+                          "Lihat Semua",
+                          style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFBBBBBB),
+                              decoration: TextDecoration.underline),
+                        ),
                       )
                     ],
                   ),
@@ -343,16 +415,56 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(25, 5, 0, 0),
                   child: SizedBox(
-                    height: 250,
-                    child: ListView.separated(
-                      itemBuilder: (context, index) =>
-                          const ProdukTerlarisDashboard(),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 12,
-                      ),
-                      itemCount: 6,
-                      scrollDirection: Axis.horizontal,
-                    ),
+                    height: 260,
+                    child: Obx(() {
+                      List<ProdukModel> listProduk =
+                          apiProduk.listProdukRekomendasi;
+                      return ListView.separated(
+                        itemBuilder: (context, index) {
+                          ProdukModel list = listProduk[index];
+                          return ProdukTerlarisDashboard(
+                            image: list.image,
+                            namaProduk: list.namaProduk,
+                            harga: list.harga.toString(),
+                            rating: list.rating,
+                            aksi: () {
+                              apiProduk.getDetailProduk(
+                                  context, list.idProduk.toString());
+                              apiProduk.getProdukBottomSheet(context, null,
+                                  null, list.idProduk.toString());
+                              Get.to(const LayoutDetailProduct(), arguments: {
+                                'idToko': list.idUser,
+                                'idProduk': list.idProduk,
+                                'namaProduk': list.namaProduk,
+                                'fotoProduk': list.image,
+                                'namaToko': list.namaToko
+                              });
+                            },
+                            aksiKeranjang: () {
+                              apiProduk.getProdukBottomSheet(context, null,
+                                  null, list.idProduk.toString());
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return BottomSheetProduk(
+                                      image: list.image,
+                                      namaProduk: list.namaProduk,
+                                      harga: list.harga.toString(),
+                                      idProduk: list.idProduk,
+                                      idToko: list.idUser,
+                                      namaToko: list.namaToko,
+                                    );
+                                  });
+                            },
+                          );
+                        },
+                        separatorBuilder: (context, index) => const SizedBox(
+                          width: 12,
+                        ),
+                        itemCount: listProduk.length,
+                        scrollDirection: Axis.horizontal,
+                      );
+                    }),
                   ),
                 ),
                 Padding(
@@ -362,18 +474,10 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Wisata",
+                        "Rekomendasi Wisata",
                         style: GoogleFonts.poppins(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                      Text(
-                        "Lihat Semua",
-                        style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFFBBBBBB),
-                            decoration: TextDecoration.underline),
-                      )
                     ],
                   ),
                 ),
@@ -382,11 +486,20 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                   child: SizedBox(
                     height: 185,
                     child: ListView.separated(
-                      itemBuilder: (context, index) => const WisataCard(),
+                      itemBuilder: (context, index) {
+                        WisataModel list = wisataList[index];
+                        return WisataCard(
+                          image: list.image,
+                          title: list.wisata,
+                          deskripsi: list.deskripsi,
+                          lokasi: list.lokasi,
+                          url: list.source,
+                        );
+                      },
                       separatorBuilder: (context, index) => const SizedBox(
                         width: 8,
                       ),
-                      itemCount: 5,
+                      itemCount: wisataList.length,
                       scrollDirection: Axis.horizontal,
                     ),
                   ),
@@ -398,18 +511,10 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Berita",
+                        "Berita Terkini",
                         style: GoogleFonts.poppins(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                      Text(
-                        "Lihat Semua",
-                        style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFFBBBBBB),
-                            decoration: TextDecoration.underline),
-                      )
                     ],
                   ),
                 ),
@@ -418,11 +523,19 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                   child: SizedBox(
                     height: 110 * 8, //110 dikali item count
                     child: ListView.separated(
-                      itemBuilder: (context, index) => const BeritaCard(),
+                      itemBuilder: (context, index) {
+                        BeritaModel list = beritaList[index];
+                        return BeritaCard(
+                          image: list.image,
+                          title: list.judul,
+                          source: list.source,
+                          url: list.link,
+                        );
+                      },
                       separatorBuilder: (context, index) => const SizedBox(
                         height: 10,
                       ),
-                      itemCount: 8,
+                      itemCount: beritaList.length,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       //scrollDirection: Axis.vertical

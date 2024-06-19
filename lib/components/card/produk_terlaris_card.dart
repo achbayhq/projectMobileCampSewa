@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:project_camp_sewa/components/bottomsheet/bottom_sheet_produk.dart';
-import 'package:project_camp_sewa/layouts/layout_detail_product.dart';
+import 'package:intl/intl.dart';
+import 'package:project_camp_sewa/constants/api_endpoint.dart';
 
 class ProdukTerlarisDashboard extends StatefulWidget {
-  const ProdukTerlarisDashboard({super.key});
+  final String image;
+  final String namaProduk;
+  final String harga;
+  final String rating;
+  final Function() aksi;
+  final Function() aksiKeranjang;
+  const ProdukTerlarisDashboard(
+      {super.key,
+      required this.image,
+      required this.namaProduk,
+      required this.harga,
+      required this.rating,
+      required this.aksi, 
+      required this.aksiKeranjang});
 
   @override
   State<ProdukTerlarisDashboard> createState() =>
@@ -13,17 +25,27 @@ class ProdukTerlarisDashboard extends StatefulWidget {
 }
 
 class _ProdukTerlarisDashboardState extends State<ProdukTerlarisDashboard> {
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter =
+        NumberFormat.decimalPattern('id'); // Use 'id' for Indonesian locale
+    return formatter.format(number);
+  }
+
+  String formatRating(String numberString) {
+    final number = double.parse(numberString);
+    return number.toStringAsFixed(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: InkWell(
-        onTap: () {
-          Get.to(const LayoutDetailProduct());
-        },
+        onTap: widget.aksi,
         child: Container(
           width: 180,
-          height: 235,
+          height: 240,
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(
                 Radius.circular(15),
@@ -35,109 +57,108 @@ class _ProdukTerlarisDashboardState extends State<ProdukTerlarisDashboard> {
                     offset: const Offset(3.0, 3.0),
                     blurRadius: 5.0)
               ]),
-          child: Column(
-            children: [
-              Container(
-                width: 175,
-                height: 150,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    image: const DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage("assets/images/produk1.jpeg"))),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 175,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(ApiEndpoints.baseUrl +
+                              ApiEndpoints.authendpoints.getImageProduk +
+                              widget.image))),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2 - 50,
+                  height: 35,
+                  child: Text(
+                    widget.namaProduk,
+                    style: GoogleFonts.poppins(
+                        fontSize: 11, fontWeight: FontWeight.w600),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: 120,
-                          height: 30,
-                          child: Text(
-                            "Borneo 4 double layer kapasitas 4 orang",
-                            style: GoogleFonts.poppins(
-                                fontSize: 10, fontWeight: FontWeight.w600),
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 6,
-                        ),
                         Row(
                           //Ini ku pisah pisah supaya ketika ambil harga di database ngga usah nambahin IDR dulu
                           children: [
                             Text(
                               "IDR. ",
                               style: GoogleFonts.poppins(
-                                  fontSize: 11, fontWeight: FontWeight.w700),
+                                  fontSize: 11.5, fontWeight: FontWeight.w700),
                             ),
                             Text(
-                              "20.000",
+                              formatCurrency(widget.harga),
                               style: GoogleFonts.poppins(
-                                  fontSize: 11, fontWeight: FontWeight.w700),
+                                  fontSize: 11.5, fontWeight: FontWeight.w700),
                             ),
                             Text(
                               "/hari",
                               style: GoogleFonts.poppins(
-                                  fontSize: 11, fontWeight: FontWeight.w700),
+                                  fontSize: 11.5, fontWeight: FontWeight.w700),
                             ),
                           ],
-                        ),
-                        const SizedBox(
-                          height: 8,
                         ),
                         Row(
                           children: [
                             const Icon(
                               Icons.star_rate_rounded,
-                              size: 15,
-                              color: Colors.black,
+                              size: 16.5,
+                              color: Color(0xFFEAB308),
                             ),
                             const SizedBox(
                               width: 2,
                             ),
                             Text(
-                              "4.5",
+                              formatRating(widget.rating),
                               style: GoogleFonts.poppins(
-                                  fontSize: 11, fontWeight: FontWeight.w600),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFFEAB308)),
                             )
                           ],
                         )
                       ],
                     ),
-                    const Spacer(),
                     InkWell(
                       //button keranjangnya
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const BottomSheetProduk(image: "assets/images/produk1.jpeg", namaProduk: "The Nort Face 4 ", harga: "20.000", variasiUkuran: ["L", "XL", "XXL"], variasiWarna: ["putih", "hitam", "pink"],);
-                            });
-                      },
+                      onTap: widget.aksiKeranjang,
                       child: Container(
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: const DecorationImage(
-                              image: AssetImage(
-                                  "assets/icons/keranjang-add-product.png"),
-                              fit: BoxFit.fill,
-                            )),
+                            borderRadius: BorderRadius.circular(12),
+                            color: const Color(0xFF000E54)),
+                        child: Center(
+                          child: Image.asset(
+                            "assets/icons/icon-keranjang.png",
+                            scale: 2,
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

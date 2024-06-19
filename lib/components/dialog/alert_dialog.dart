@@ -45,6 +45,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
                   color: Colors.black),
+              textAlign: TextAlign.center,
             ),
             Text(
               widget.teks!,

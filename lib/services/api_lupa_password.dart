@@ -60,7 +60,7 @@ class ApiLupaPassword extends GetxController {
           Get.to(const LayoutLupaPasswordOTP(), arguments: kirimData);
         }
         telephoneController.clear();
-      } else{
+      } else {
         String errorMessage = json['message'];
         final snackBar = SnackBar(
             elevation: 0,
@@ -135,7 +135,10 @@ class ApiLupaPassword extends GetxController {
           ..showSnackBar(snackBar);
 
         if (context.mounted) {
-          var kirimData = {'nomor_telephone': noTelephone};
+          var kirimData = {
+            'nomor_telephone': noTelephone,
+            'lupa_password': true
+          };
           Get.to(const LayoutLupaPasswordNewPass(), arguments: kirimData);
         }
       } else {
@@ -172,7 +175,7 @@ class ApiLupaPassword extends GetxController {
   }
 
   Future<void> lupaPassResetPass(
-      BuildContext context, String noTelephone) async {
+      BuildContext context, String noTelephone, bool lupaPass) async {
     try {
       loading.showLoadingDialog();
       var header = {'Accept': 'application/json'};
@@ -216,7 +219,11 @@ class ApiLupaPassword extends GetxController {
         newPassController.clear();
         confirmPassController.clear();
         if (context.mounted) {
-          Get.off(const LoginScreen());
+          if (lupaPass) {
+            Get.off(const LoginScreen());
+          } else {
+            Get.back();
+          }
         }
       } else {
         String errorMessage = json['message'];

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_camp_sewa/components/button/opsi_pembayaran.dart';
 import 'package:project_camp_sewa/components/button/opsi_pembayaran_transfer.dart';
+import 'package:project_camp_sewa/models/bank_model.dart';
+import 'package:project_camp_sewa/services/api_transaksi.dart';
 
 class LayoutMetodePembayaran extends StatefulWidget {
   const LayoutMetodePembayaran({super.key});
@@ -12,6 +14,7 @@ class LayoutMetodePembayaran extends StatefulWidget {
 }
 
 class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
+  ApiTransaksi apiTransaksi = Get.put(ApiTransaksi());
   String selectedIcon = "assets/icons/selected-opsi-bayar.png";
   String defaultIcon = "assets/icons/default-opsi-bayar.png";
   Color selectedBgColor = const Color(0xFF010935);
@@ -20,13 +23,21 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
   Color defaultTextColor = Colors.black;
   String selectedOption = "transfer";
   String? selectedBank;
-  List opsiTransfer = [
-    "Bank BRI",
-    "Bank Mandiri",
-    "Bank BCA",
-    "Bank BSI",
-    "Bank Sinarmas"
-  ];
+  String? rekeningBank;
+
+  @override
+  void initState() {
+    super.initState();
+    getListBank();
+  }
+
+  Future<void> getListBank() async {
+    final arguments = await Get.arguments as Map<String, dynamic>;
+    String idToko = arguments['idToko'];
+    // ignore: use_build_context_synchronously
+    await apiTransaksi.getBankOpsiPembayaran(context, idToko);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,8 +133,7 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (Widget child, Animation<double> animation) {
                 final offsetAnimation = Tween<Offset>(
-                  begin:
-                      const Offset(0.0, 0.0),
+                  begin: const Offset(0.0, 0.0),
                   end: const Offset(0.0, 0.0),
                 ).animate(animation);
 
@@ -140,24 +150,30 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
                       key: const ValueKey(
                           'ListViewColumn'), // Key untuk mengidentifikasi widget unik
                       children: [
-                        ListView.builder(
-                          itemCount: opsiTransfer.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: () {
-                                setState(() {
-                                  selectedBank = opsiTransfer[index];
-                                });
-                              },
-                              child: OpsiPembayaranTransfer(
-                                bank: opsiTransfer[index],
-                                selected: selectedBank == opsiTransfer[index],
-                              ),
-                            );
-                          },
-                        ),
+                        Obx(() {
+                          List<BankModel> listBank =
+                              apiTransaksi.listBankMetodeBayar;
+                          return ListView.builder(
+                            itemCount: apiTransaksi.listBankMetodeBayar.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              BankModel list = listBank[index];
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    selectedBank = list.bank;
+                                    rekeningBank = list.rekening;
+                                  });
+                                },
+                                child: OpsiPembayaranTransfer(
+                                  bank: list.bank,
+                                  selected: selectedBank == list.bank,
+                                ),
+                              );
+                            },
+                          );
+                        }),
                       ],
                     )
                   : const SizedBox(
@@ -198,8 +214,12 @@ class _LayoutMetodePembayaranState extends State<LayoutMetodePembayaran> {
                 onTap: () {
                   Get.back(
                       result: selectedOption == "transfer"
-                          ? {"metodeBayar": "Transfer", "jenisBank": "$selectedBank"}
-                          : {"metodeBayar": "Bayar Ditempat"});
+                          ? {
+                              'metodeBayar': "Transfer",
+                              'jenisBank': "$selectedBank",
+                              'rekeningBank': rekeningBank
+                            }
+                          : {'metodeBayar': "Bayar Ditempat"});
                 },
                 child: Container(
                   decoration: BoxDecoration(

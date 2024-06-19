@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:project_camp_sewa/constants/api_endpoint.dart';
 
 class CheckoutProdukCard extends StatefulWidget {
   final String? image;
-  final String? namaToko;
   final String? namaProduk;
   final String variasiWarna;
   final String variasiUkuran;
@@ -12,7 +13,6 @@ class CheckoutProdukCard extends StatefulWidget {
   const CheckoutProdukCard(
       {super.key,
       this.image,
-      this.namaToko,
       this.namaProduk,
       this.variasiWarna = "",
       this.variasiUkuran = "",
@@ -24,42 +24,27 @@ class CheckoutProdukCard extends StatefulWidget {
 }
 
 class _CheckoutProdukCardState extends State<CheckoutProdukCard> {
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter =
+        NumberFormat.decimalPattern('id'); // Use 'id' for Indonesian locale
+    return formatter.format(number);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+          border: Border.symmetric(
+              horizontal:
+                  BorderSide(width: 0.6, color: Colors.black.withOpacity(0.5))),
+          color: Colors.white),
       child: IntrinsicHeight(
         child: Column(
           children: [
-            Expanded(
-              child: Container(
-              color: const Color(0xFF010935),
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 5,),
-                        child: Image.asset(
-                          "assets/icons/icon-store.png",
-                          scale: 2,
-                        ),
-                      ),
-                      Text(
-                        widget.namaToko!,
-                        style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 3),
+              padding:
+                  const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 3),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -68,7 +53,10 @@ class _CheckoutProdukCardState extends State<CheckoutProdukCard> {
                     width: 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      image: DecorationImage(image: AssetImage(widget.image!)),
+                      image: DecorationImage(
+                          image: NetworkImage(ApiEndpoints.baseUrl +
+                              ApiEndpoints.authendpoints.getImageProduk +
+                              widget.image!)),
                       boxShadow: [
                         BoxShadow(
                             color: const Color(0xFF494949).withOpacity(0.2),
@@ -122,7 +110,7 @@ class _CheckoutProdukCardState extends State<CheckoutProdukCard> {
                                           color: Colors.black),
                                     ),
                                     Text(
-                                      widget.hargaProduk!,
+                                      formatCurrency(widget.hargaProduk!),
                                       style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,

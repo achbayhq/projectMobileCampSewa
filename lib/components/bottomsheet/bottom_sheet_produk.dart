@@ -1,28 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:project_camp_sewa/components/card/item_variant.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
+import 'package:project_camp_sewa/constants/api_endpoint.dart';
+import 'package:project_camp_sewa/constants/database_helper.dart';
+import 'package:project_camp_sewa/services/api_produk.dart';
 
 class BottomSheetProduk extends StatefulWidget {
   final String? image;
   final String? namaProduk;
   final String? harga;
-  final List? variasiWarna;
-  final List? variasiUkuran;
-  const BottomSheetProduk(
-      {super.key,
-      this.image,
-      this.namaProduk,
-      this.harga,
-      this.variasiWarna,
-      this.variasiUkuran});
+  final int? idProduk;
+  final int? idToko;
+  final String? namaToko;
+  const BottomSheetProduk({
+    super.key,
+    this.image,
+    this.namaProduk,
+    this.harga,
+    this.idProduk,
+    this.idToko,
+    this.namaToko,
+  });
 
   @override
   State<BottomSheetProduk> createState() => _BottomSheetProdukState();
 }
 
 class _BottomSheetProdukState extends State<BottomSheetProduk> {
+  ApiProduk apiProduk = Get.put(ApiProduk());
+  String? pemberitahuan = "";
+  String? selectedWarna;
+  String? selectedUkuran;
+  String? harga;
+  String? stok;
+  int qty = 1;
+
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter =
+        NumberFormat.decimalPattern('id'); // Use 'id' for Indonesian locale
+    return formatter.format(number);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -51,19 +74,25 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           image: DecorationImage(
-                              image: AssetImage(widget.image!))),
+                              image: NetworkImage(ApiEndpoints.baseUrl +
+                                  ApiEndpoints.authendpoints.getImageProduk +
+                                  widget.image!))),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 5, top: 5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.namaProduk!,
-                            style: GoogleFonts.poppins(
-                                fontSize: 16.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width / 1.85,
+                            child: Text(
+                              widget.namaProduk!,
+                              maxLines: null,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black),
+                            ),
                           ),
                           Row(
                             children: [
@@ -75,7 +104,9 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                                     color: Colors.black),
                               ),
                               Text(
-                                widget.harga!,
+                                harga != null
+                                    ? formatCurrency(harga!)
+                                    : formatCurrency(widget.harga!),
                                 style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -90,62 +121,133 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                               ),
                             ],
                           ),
+                          Visibility(
+                            visible: stok != null,
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Stok : ",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black),
+                                ),
+                                Text(
+                                  stok != null ? stok! : "",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 5,),
-                widget.variasiWarna != null
-                    ? Text(
-                        "Warna",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
-                      )
-                    : const SizedBox(),
-                widget.variasiWarna != null
-                    ? SizedBox(
-                        height: 30,
-                        child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) => ItemVariant(
-                                  item: widget.variasiWarna![index],
-                                ),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                            itemCount: widget.variasiWarna!.length),
-                      )
-                    : const SizedBox(),
-                    const SizedBox(height: 5,),
-                widget.variasiUkuran != null
-                    ? Text(
-                        "Ukuran",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
-                      )
-                    : const SizedBox(),
-                widget.variasiUkuran != null
-                    ? SizedBox(
-                        height: 30,
-                        child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) => ItemVariant(
-                                  item: widget.variasiUkuran![index],
-                                ),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                            itemCount: widget.variasiUkuran!.length),
-                      )
-                    : const SizedBox(),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  "Warna",
+                  style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black),
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Obx(() {
+                    List<String> listWarna = apiProduk.colors;
+                    return ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return ItemVariant(
+                            item: listWarna[index],
+                            selected: selectedWarna == listWarna[index],
+                            aksi: () {
+                              apiProduk.updateAllUniqueSizes(
+                                  color: listWarna[index]);
+                              setState(() {
+                                selectedWarna = listWarna[index];
+                              });
+                            },
+                          );
+                        },
+                        separatorBuilder: (context, index) => const SizedBox(
+                              width: 5,
+                            ),
+                        itemCount: listWarna.length);
+                  }),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  "Ukuran",
+                  style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black),
+                ),
+                SizedBox(
+                    height: 30,
+                    child: Obx(() {
+                      List<String> listUkuran = apiProduk.uniqueSizes;
+                      return ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => ItemVariant(
+                                item: listUkuran[index],
+                                selected: selectedUkuran == listUkuran[index],
+                                aksi: () {
+                                  setState(() {
+                                    selectedUkuran = listUkuran[index];
+                                  });
+
+                                  if (selectedWarna != null &&
+                                      selectedUkuran != null) {
+                                    var result = apiProduk.getStockAndPrice(
+                                        selectedWarna!, selectedUkuran!);
+                                    if (result != null) {
+                                      setState(() {
+                                        harga = result['harga'].toString();
+                                        int stokInt = result['stok'];
+                                        stok = stokInt.toString();
+                                        pemberitahuan = "";
+                                        if (qty > stokInt) {
+                                          qty = stokInt;
+                                        }
+                                      });
+                                    }
+                                  }
+                                },
+                              ),
+                          separatorBuilder: (context, index) => const SizedBox(
+                                width: 5,
+                              ),
+                          itemCount: listUkuran.length);
+                    })),
                 const Spacer(),
+                Visibility(
+                  visible: pemberitahuan != null,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 3.5),
+                        child: Text(
+                          pemberitahuan!,
+                          style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red.withOpacity(0.8)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -169,7 +271,20 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                           children: [
                             InkWell(
                               onTap: () {
-                                //tambah qty produk
+                                setState(() {
+                                  if (stok != null) {
+                                    if (qty < int.parse(stok!)) {
+                                      qty++;
+                                      pemberitahuan = "";
+                                    } else {
+                                      pemberitahuan =
+                                          "*Quantity Telah Mencapai Batas Stok";
+                                    }
+                                  } else {
+                                    pemberitahuan =
+                                        "*Pilih Warna dan Ukuran Terlebih Dahulu";
+                                  }
+                                });
                               },
                               child: const Padding(
                                 padding: EdgeInsets.only(left: 3),
@@ -181,13 +296,18 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                               ),
                             ),
                             Text(
-                              "10",
+                              qty.toString(),
                               style: GoogleFonts.poppins(
                                   fontSize: 12, fontWeight: FontWeight.w700),
                             ),
                             InkWell(
                               onTap: () {
-                                //kurangi qty produk
+                                setState(() {
+                                  if (qty > 1) {
+                                    qty--;
+                                    pemberitahuan = "";
+                                  }
+                                });
                               },
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 3),
@@ -212,8 +332,28 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    //tambahkan ke keranjang
+                  onTap: () async {
+                    if (selectedWarna != null && selectedUkuran != null) {
+                      Map<String, dynamic> newRow = {
+                        'id_toko': widget.idToko,
+                        'id_produk': widget.idProduk,
+                        'nama_toko': widget.namaToko,
+                        'foto_produk': widget.image,
+                        'nama_produk': widget.namaProduk,
+                        'variant_warna': selectedWarna,
+                        'variant_ukuran': selectedUkuran,
+                        'harga': harga,
+                        'qty': qty,
+                        'selected': 0
+                      };
+                      await DatabaseHelper.instance
+                          .insertKeranjang(newRow, context);
+                      Get.back();
+                    } else {
+                      setState(() {
+                        pemberitahuan = "*Pilih Warna dan Ukuran Terebih Dahulu";
+                      });
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -242,8 +382,8 @@ class _BottomSheetProdukState extends State<BottomSheetProduk> {
           ),
         ),
         Positioned(
-          top : 10,
-          right: 10,
+            top: 10,
+            right: 10,
             child: IconButton(
                 onPressed: () {
                   Get.back();

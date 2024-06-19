@@ -1,8 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
+import 'package:project_camp_sewa/services/api_transaksi.dart';
 
 class LayoutPembayaran extends StatefulWidget {
   const LayoutPembayaran({super.key});
@@ -12,6 +16,55 @@ class LayoutPembayaran extends StatefulWidget {
 }
 
 class _LayoutPembayaranState extends State<LayoutPembayaran> {
+  ApiTransaksi apiTransaksi = Get.put(ApiTransaksi());
+  int? idPenyewaan;
+  int? idToko;
+  String? rekeningBank;
+  String? totalPembayaran;
+  String? bank;
+  XFile? buktiPembayaran;
+  XFile? jaminanSewa;
+
+  @override
+  void initState() {
+    super.initState();
+    Map<String, dynamic> arguments = Get.arguments as Map<String, dynamic>;
+    idPenyewaan = arguments['id_penyewaan'];
+    idToko = arguments['id_toko'];
+    rekeningBank = arguments['rekening_bank'];
+    totalPembayaran = arguments['total_pembayaran'];
+    bank = arguments['bank'];
+  }
+
+  String formatCurrency(String numberString) {
+    final number = int.parse(numberString);
+    final formatter = NumberFormat.decimalPattern('id');
+    return formatter.format(number);
+  }
+
+  checkPermissions() async {
+    Map<Permission, PermissionStatus> status = await [
+      Permission.camera,
+      Permission.storage,
+    ].request();
+    if (status[Permission.camera] != PermissionStatus.granted ||
+        status[Permission.storage] != PermissionStatus.granted) {
+      return;
+    }
+  }
+
+  pickedBuktiPembayaran() async {
+    final picker = ImagePicker();
+    buktiPembayaran = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {});
+  }
+
+  pickedJaminanSewa() async {
+    final picker = ImagePicker();
+    jaminanSewa = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +129,9 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
                         color: Colors.black),
                   ),
                   Text(
-                    "121.000", //total pembayaran
+                    totalPembayaran != null
+                        ? formatCurrency(totalPembayaran!)
+                        : "0", //total pembayaran
                     style: GoogleFonts.poppins(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
@@ -125,7 +180,7 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
                             width: 3,
                           ),
                           Text(
-                            "Bank BRI", //bank
+                            bank != null ? bank! : "bank - ", //bank
                             style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
@@ -148,7 +203,9 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
                   Padding(
                     padding: const EdgeInsets.only(left: 25, right: 15, top: 5),
                     child: Text(
-                      "965 9897 8687 9679", //nomor rekening
+                      rekeningBank != null
+                          ? rekeningBank!
+                          : "000 000 000", //nomor rekening
                       style: GoogleFonts.poppins(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w700,
@@ -215,7 +272,8 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
               height: 1.2,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 10, top: 15, bottom: 3),
+              padding: const EdgeInsets.only(
+                  left: 15, right: 10, top: 15, bottom: 3),
               child: Row(
                 children: [
                   Text(
@@ -239,54 +297,59 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.5), width: 1.2),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white
-                ),
+                    border: Border.all(
+                        color: Colors.black.withOpacity(0.5), width: 1.2),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white),
                 child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        //upload bukti pembayaran
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.black.withOpacity(0.2)),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 6.5, horizontal: 20),
-                            child: Text(
-                              "Pilih File",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          //upload bukti pembayaran
+                          await checkPermissions();
+                          await pickedBuktiPembayaran();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.black.withOpacity(0.2)),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6.5, horizontal: 20),
+                              child: Text(
+                                "Pilih File",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.7,
-                      child: Text(
-                        "Upload Bukti Pembayaran",    //nama file bukti pembayaran
-                        textAlign: TextAlign.end,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black.withOpacity(0.6)),
+                      const Spacer(),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.7,
+                        child: Text(
+                          buktiPembayaran != null
+                              ? buktiPembayaran!.name
+                              : "Upload Bukti Pembayaran", //nama file bukti pembayaran
+                          textAlign: TextAlign.end,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black.withOpacity(0.6)),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               ),
             ),
             Padding(
@@ -305,7 +368,8 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 10, top: 5, bottom: 3),
+              padding:
+                  const EdgeInsets.only(left: 15, right: 10, top: 5, bottom: 3),
               child: Row(
                 children: [
                   Text(
@@ -329,54 +393,59 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.5), width: 1.2),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white
-                ),
+                    border: Border.all(
+                        color: Colors.black.withOpacity(0.5), width: 1.2),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white),
                 child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        //upload jaminan
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.black.withOpacity(0.2)),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 6.5, horizontal: 20),
-                            child: Text(
-                              "Pilih File",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          //upload jaminan
+                          await checkPermissions();
+                          await pickedJaminanSewa();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.black.withOpacity(0.2)),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6.5, horizontal: 20),
+                              child: Text(
+                                "Pilih File",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.7,
-                      child: Text(
-                        "Upload Jaminan",   //nama file jaminan
-                        textAlign: TextAlign.end,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black.withOpacity(0.6)),
+                      const Spacer(),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.7,
+                        child: Text(
+                          jaminanSewa != null
+                              ? jaminanSewa!.name
+                              : "Upload Jaminan", //nama file jaminan
+                          textAlign: TextAlign.end,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black.withOpacity(0.6)),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               ),
             ),
             Padding(
@@ -404,6 +473,30 @@ class _LayoutPembayaranState extends State<LayoutPembayaran> {
               child: InkWell(
                 onTap: () {
                   //konfirmasi
+                  if (buktiPembayaran != null && jaminanSewa != null) {
+                    apiTransaksi.transaksiPembayaran(
+                        context,
+                        idPenyewaan!.toString(),
+                        idToko!.toString(),
+                        totalPembayaran!,
+                        buktiPembayaran!,
+                        jaminanSewa!);
+                  } else {
+                    const snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: CustomSnackBar(
+                          sukses: false,
+                          title: "Pembayaran Gagal",
+                          teks:
+                              "Upload Bukti Pembayaran dan Jaminan Sewa Terlebih Dahulu!",
+                        ));
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar);
+                  }
                 },
                 child: Container(
                   decoration: BoxDecoration(

@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:project_camp_sewa/components/card/alamat_card.dart';
 import 'package:project_camp_sewa/layouts/layout_edit_alamat.dart';
+import 'package:project_camp_sewa/models/alamat_model.dart';
+import 'package:project_camp_sewa/services/api_data_user.dart';
 
 class LayoutAlamat extends StatefulWidget {
   const LayoutAlamat({super.key});
@@ -13,7 +15,13 @@ class LayoutAlamat extends StatefulWidget {
 }
 
 class _LayoutAlamatState extends State<LayoutAlamat> {
-  List listAlamat = [];
+  ApiDataUser apiDataUser = Get.put(ApiDataUser());
+
+  @override
+  void initState() {
+    super.initState();
+    apiDataUser.getListAlamatUser(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,27 +68,37 @@ class _LayoutAlamatState extends State<LayoutAlamat> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: ListView.separated(
-                    itemBuilder: (context, index) => AlamatCard(
+                child: Obx(() {
+                  List<AlamatUserModel> listAlamatUser =
+                      apiDataUser.listAlamatUser;
+                  return ListView.separated(
+                      itemBuilder: (context, index) {
+                        AlamatUserModel listAlamat = listAlamatUser[index];
+                        return AlamatCard(
                           editAlamat: () {
-                            Get.to(const LayoutEditAlamat(
+                            Get.to(LayoutEditAlamat(
                               edit: true,
-                              namaLengkap: "Agung Kurniawan",
-                              noTelepon: "088123473948",
-                              alamat: "Perumahan Permai Damai, Blok Z1, RT/RW : 02/03, Kelurahan Asem, Sumber Air, Kab. Jedug, Jawa Kulon, ID 88689",
-                              ditandaiSebagai: "rumah",
+                              idAlamat: listAlamat.id.toString(),
+                              namaLengkap: listAlamat.name,
+                              noTelepon: listAlamat.nomorTelephone,
+                              ditandaiSebagai: listAlamat.type,
+                              latitude: listAlamat.latitude,
+                              longitude: listAlamat.longitude,
+                              detailAlamat: listAlamat.detailLainnya ?? "",
                             ));
                           },
-                          namaUser: "Agung Kurniwan",
-                          alamatUser:
-                              "Perumahan Permai Damai, Blok Z1, RT/RW : 02/03, Kelurahan Asem, Sumber Air, Kab. Jedug, Jawa Kulon, ID 88689",
-                          noTeleponUser: "088123473948",
-                          tipeAlamat: "rumah",
-                        ),
-                    separatorBuilder: (context, index) => const SizedBox(
-                          height: 10,
-                        ),
-                    itemCount: 3),
+                          namaUser: listAlamat.name,
+                          latitude: listAlamat.latitude,
+                          longitude: listAlamat.longitude,
+                          noTeleponUser: listAlamat.nomorTelephone,
+                          tipeAlamat: listAlamat.type,
+                        );
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(
+                            height: 10,
+                          ),
+                      itemCount: listAlamatUser.length);
+                }),
               ),
             ),
             Padding(

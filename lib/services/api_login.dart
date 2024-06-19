@@ -7,13 +7,14 @@ import 'package:project_camp_sewa/components/dialog/loading_dialog.dart';
 import 'package:project_camp_sewa/components/dialog/snackbar.dart';
 import 'package:project_camp_sewa/constants/api_endpoint.dart';
 import 'package:project_camp_sewa/screens/screen_dashboard.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:project_camp_sewa/services/authorization_token.dart';
 
 class ApiLogin extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final Dio dio = Dio();
   final LoadingDialog loading = Get.put(LoadingDialog());
+  Authorization auth = Authorization();
 
   Future<void> login(BuildContext context) async {
     try {
@@ -44,9 +45,11 @@ class ApiLogin extends GetxController {
         if (json['access_token'] != null) {
           var token = json['access_token'];
           var idUser = json['user']['id'];
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', token);
-          await prefs.setInt('idUser', idUser);
+          // final prefs = await SharedPreferences.getInstance();
+          // await prefs.setString('token', token);
+          // await prefs.setInt('idUser', idUser);
+          auth.saveToken(token);
+          auth.saveId(idUser);
           emailController.clear();
           passwordController.clear();
 
@@ -64,6 +67,7 @@ class ApiLogin extends GetxController {
             ..showSnackBar(snackBar);
 
           if (context.mounted) {
+
             Get.off(const ScreenDashboard());
           }
         } else {

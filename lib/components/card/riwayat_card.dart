@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -18,7 +16,6 @@ class RiwayatCard extends StatefulWidget {
   final String fotoProduk;
   final String? statusHari;
   final String statusTransaksi;
-  final Color warnaStatusTransaksi;
 
   const RiwayatCard(
       {super.key,
@@ -34,7 +31,6 @@ class RiwayatCard extends StatefulWidget {
       required this.totalPesanan,
       required this.hari,
       required this.statusTransaksi,
-      this.warnaStatusTransaksi = Colors.red,
       this.statusHari = "hari pengembalian"});
 
   @override
@@ -328,7 +324,9 @@ class _RiwayatCardState extends State<RiwayatCard> {
                           style: GoogleFonts.poppins(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              color: widget.warnaStatusTransaksi),
+                              color: widget.statusTransaksi == "Lunas"
+                                  ? Colors.green
+                                  : Colors.red),
                         )
                       ],
                     )

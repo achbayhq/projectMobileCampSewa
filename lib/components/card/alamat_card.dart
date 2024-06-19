@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_camp_sewa/components/dialog/snackbar.dart';
 
 class AlamatCard extends StatefulWidget {
   final String? namaUser;
   final String? noTeleponUser;
-  final String? alamatUser;
+  final String longitude;
+  final String latitude;
   final String? tipeAlamat;
   final Function()? editAlamat;
   const AlamatCard(
       {super.key,
-      this.alamatUser,
+      required this.longitude,
+      required this.latitude,
       this.noTeleponUser,
       this.namaUser,
       this.tipeAlamat,
@@ -20,6 +24,38 @@ class AlamatCard extends StatefulWidget {
 }
 
 class _AlamatCardState extends State<AlamatCard> {
+  Future<String> convertAlamat(String strLatitude, String strLongitude) async {
+    double latitude = double.parse(strLatitude);
+    double longitude = double.parse(strLongitude);
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(latitude, longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String jalan = placemark.street ?? '';
+      String postalCode = placemark.postalCode ?? '';
+      String kecamatan = placemark.subLocality ?? '';
+      String kabupaten = placemark.locality ?? '';
+      String provinsi = placemark.administrativeArea ?? '';
+      String alamat = "$jalan, $kecamatan, $kabupaten, $provinsi, $postalCode";
+      return alamat;
+    } else {
+      const snackBar = SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: CustomSnackBar(
+            sukses: false,
+            teks: "Tidak bisa Mengkonversi koordinat alamat anda",
+          ));
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -83,12 +119,27 @@ class _AlamatCardState extends State<AlamatCard> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-            child: Text(
-              widget.alamatUser!,
-              style: GoogleFonts.poppins(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black),
+            child: FutureBuilder<String>(
+              future: convertAlamat(widget.latitude, widget.longitude),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Text(
+                    "Loading...",
+                    style: GoogleFonts.poppins(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black),
+                  );
+                }else {
+                  return Text(
+                    snapshot.data ?? "Alamat tidak ditemukan",
+                    style: GoogleFonts.poppins(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black),
+                  );
+                }
+              },
             ),
           ),
           Padding(
@@ -96,16 +147,17 @@ class _AlamatCardState extends State<AlamatCard> {
                 const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
             child: Row(
               children: [
-                widget.tipeAlamat == "rumah"
+                widget.tipeAlamat == "Rumah"
                     ? Image.asset(
                         "assets/icons/icon-alamat-home.png",
                         scale: 2,
                       )
                     : Image.asset(
                         "assets/icons/alamat-kantor.png",
-                        scale: 2,
+                        scale: 4,
                       ),
-                widget.tipeAlamat == "rumah"
+                const SizedBox(width: 3,),
+                widget.tipeAlamat == "Rumah"
                     ? Text(
                         "Rumah",
                         style: GoogleFonts.poppins(
