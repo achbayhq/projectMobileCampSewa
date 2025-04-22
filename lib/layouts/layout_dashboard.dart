@@ -19,10 +19,12 @@ import 'package:project_camp_sewa/models/iklan_model.dart';
 import 'package:project_camp_sewa/models/produk_model.dart';
 import 'package:project_camp_sewa/models/user.dart';
 import 'package:project_camp_sewa/models/wisata_model.dart';
+import 'package:project_camp_sewa/screens/screen_login.dart';
 import 'package:project_camp_sewa/services/api_data_user.dart';
 import 'package:project_camp_sewa/services/api_iklan.dart';
 import 'package:project_camp_sewa/services/api_produk.dart';
 import 'package:project_camp_sewa/services/controller_dashboard.dart';
+import 'package:project_camp_sewa/services/authorization_token.dart';
 
 class LayoutDashboard extends StatefulWidget {
   const LayoutDashboard({super.key});
@@ -144,19 +146,24 @@ class _LayoutDashboardState extends State<LayoutDashboard> {
                       onTap: () async {
                         //fungsi klik notification
                         //DatabaseHelper.instance.deleteAllKeranjang(context);
-                        const snackBar = SnackBar(
-                            elevation: 0,
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: Colors.transparent,
-                            content: CustomSnackBar(
-                              sukses: false,
-                              title: "Coming Soon",
-                              teks: "Fitur Notification Akan Tersedia Segera",
-                            ));
+                        // const snackBar = SnackBar(
+                        //     elevation: 0,
+                        //     behavior: SnackBarBehavior.floating,
+                        //     backgroundColor: Colors.transparent,
+                        //     content: CustomSnackBar(
+                        //       sukses: false,
+                        //       title: "Coming Soon",
+                        //       teks: "Fitur Notification Akan Tersedia Segera",
+                        //     ));
 
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar);
+                        // ScaffoldMessenger.of(context)
+                        //   ..hideCurrentSnackBar()
+                        //   ..showSnackBar(snackBar);
+
+                        Authorization auth = Authorization();
+                        auth.deleteId();
+                        auth.deleteToken();
+                        Get.off(const LoginScreen());
                       },
                       child: Container(
                         width: 40,
